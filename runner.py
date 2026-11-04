@@ -12,6 +12,17 @@ import urllib.error
 
 import edge_tts
 
+try:
+    from cluster.sector_curriculums import resolve_sector, get_procedural_masterclass, SECTORS
+except ImportError:
+    try:
+        from core.cluster.sector_curriculums import resolve_sector, get_procedural_masterclass, SECTORS
+    except ImportError:
+        try:
+            from sector_curriculums import resolve_sector, get_procedural_masterclass, SECTORS
+        except ImportError:
+            resolve_sector = None
+
 # 🎬 20 High-Retention Institutional Trading Topics (1 for each Matrix Runner)
 ENGLISH_TOPIC_REGISTRY = [
     {"title": "Why 99% Of Traders Fail: The Biological Conditioning Of Retail Slaughter", "voice": "en-US-ChristopherNeural", "channel": "SmartMoneyAlpha"},
@@ -46,218 +57,148 @@ def query_groq_api(prompt: str, system_prompt: str, key: str) -> str:
     models = ["openai/gpt-oss-120b", "openai/gpt-oss-20b", "qwen/qwen3.8-27b"]
     last_err = None
     for model in models:
-        try:
-            req = urllib.request.Request(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers={
-                    "Authorization": f"Bearer {key}",
-                    "Content-Type": "application/json",
-                    "User-Agent": "Moneyprinter-Cluster/2.0"
-                },
-                data=json.dumps({
-                    "model": model,
-                    "messages": [
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": prompt}
-                    ],
-                    "max_tokens": 4096,
-                    "temperature": 0.7
-                }).encode("utf-8")
-            )
-            with urllib.request.urlopen(req, timeout=30) as resp:
-                data = json.loads(resp.read().decode())
-                content = data["choices"][0]["message"].get("content", "").strip()
-                if content:
-                    return content
-        except Exception as e:
-            last_err = e
-            continue
+        for attempt in range(2):
+            try:
+                req = urllib.request.Request(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {key}",
+                        "Content-Type": "application/json",
+                        "User-Agent": "Moneyprinter-Cluster/2.0"
+                    },
+                    data=json.dumps({
+                        "model": model,
+                        "messages": [
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "max_tokens": 4096,
+                        "temperature": 0.68
+                    }).encode("utf-8")
+                )
+                with urllib.request.urlopen(req, timeout=35) as resp:
+                    data = json.loads(resp.read().decode())
+                    content = data["choices"][0]["message"].get("content", "").strip()
+                    if content:
+                        return content
+            except urllib.error.HTTPError as e:
+                last_err = e
+                if e.code == 429:
+                    time.sleep(2.5)
+                elif e.code == 400:
+                    break
+            except Exception as e:
+                last_err = e
+                time.sleep(1.0)
     raise RuntimeError(f"All Groq models failed: {last_err}")
 
-def generate_15min_script(topic: str, job_id: int) -> str:
+def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
     """
-    Generates a true 15+ minute (2,300 - 2,500 words) deep psychological masterclass script.
-    Uses Dual-Key Groq load balancing with automated model fallback and procedural safety net.
-    Embeds the 5-Stage Psychological Retention & Conversion CTA Engine.
+    Generates a true 15+ minute (2,300 - 2,500 words) deep institutional trading masterclass script.
+    Dynamically routes to one of 5 distinct Wall Street / CME sectors with unique personas,
+    10 sector-specific movements, and high-retention psychological CTAs.
+    Uses Dual-Key Groq load balancing (openai/gpt-oss-120b primary) with bespoke procedural fallbacks.
     """
-    print(f"\n[1/5] 🧠 Generating 16-Min Deep Psychological Script for: {topic}...")
+    # 1. Resolve Sector Curriculum
+    if resolve_sector:
+        sec = resolve_sector(job_id, channel)
+    else:
+        sec = {
+            "name": "Wall Street Quantitative Trading",
+            "key": "orderflow",
+            "voice": "en-US-ChristopherNeural",
+            "persona": "You are an elite quantitative Wall Street trading psychologist and continuous double auction theorist.",
+            "movements_p1": [
+                ("Movement 1: Microscopic Auction Theory & Continuous Double Auction Mechanics", "Hook CTA: Ask viewers to comment their biggest slippage loss."),
+                ("Movement 2: The Electronic Broking Services & CME Order Book Reality", ""),
+                ("Movement 3: Passive Limit Absorption vs Aggressive Market Orders", "CTA: Like if you've seen liquidity vanish."),
+                ("Movement 4: Level 2 Depth of Market Topography", ""),
+                ("Movement 5: Algorithmic Iceberg Slicing: Hidden Institutional Orders", "")
+            ],
+            "movements_p2": [
+                ("Movement 6: Cumulative Volume Delta Absorption & Aggressive Exhaustion", "Proof CTA: Subscribe for weekly order flow leaks."),
+                ("Movement 7: Dark Pool Cross-Trades: Hedge Fund Block Accumulation", ""),
+                ("Movement 8: Micro-Price Drift Mathematics & Imbalance Ratios", "Asset CTA: Comment your traded ticker."),
+                ("Movement 9: Volume Profile Architecture: Naked POCs & Value Areas", ""),
+                ("Movement 10: The Tape Reader's Execution Checklist", "Outro CTA: Like and subscribe to join the institutional elite.")
+            ]
+        }
+
+    sec_name = sec["name"]
+    sec_key = sec.get("key", "orderflow")
+    print(f"\n[1/5] 🧠 Generating 16-Min Masterclass for: '{topic}'")
+    print(f"      🏛️ Sector: {sec_name} | Key: {sec_key}")
+
     primary_key = GROQ_KEYS[(job_id - 1) % len(GROQ_KEYS)]
     backup_key = GROQ_KEYS[job_id % len(GROQ_KEYS)]
 
     system_prompt = (
-        "You are an elite quantitative Wall Street trading psychologist and former central bank order execution architect. "
-        "You write deeply analytical, intellectually devastating trading documentary scripts that expose the mechanical illusion "
-        "of retail trading. Speak with absolute authority, cold first-principles logic, and zero generic marketing fluff. "
+        f"{sec['persona']} "
+        "You write deeply analytical, intellectually devastating trading documentary masterclasses that expose the mechanical illusion "
+        "of retail trading. Speak with absolute authority, cold first-principles logic, authentic mathematical formulas, and zero generic marketing fluff. "
         "Write ONLY the spoken voiceover narration prose. Do NOT include bracketed stage directions like [Camera zooms] or cues. "
         "Weave the explicit engagement call-to-actions (CTAs) seamlessly into the high-IQ institutional narrative."
     )
 
     try:
-        # Phase 1: Movements 1 to 5 (~1,200 words)
-        p1_prompt = f"""Write Movements 1 to 5 of an elite 16-minute financial documentary masterclass on '{topic}'.
-Structure strictly into these 5 movements, each with a full 230-word deeply analytical spoken paragraph:
-=== Movement 1: The Evolutionary Dopamine Trap (The Biological Conditioning of Retail Slaughter) ===
-(MANDATORY CTA: Embed a sharp, unskippable hook CTA telling the viewer to pause and comment their single biggest trading drawdown, promising mathematical proof by minute 14 why that liquidity was harvested.)
-=== Movement 2: Microscopic Auction Theory & The Electronic Broking Service (EBS) Reality ===
-=== Movement 3: Order Book Engineering & Algorithmic Icebergs in Dark Pools ===
-(MANDATORY CTA: Embed a controversial CTA forcing the viewer to hit like if they've ever had their stop-loss wicked out before price exploded to take-profit without them.)
-=== Movement 4: The Displacement Footprint & Delta Volume Imbalance ===
-=== Movement 5: The Mathematical Geometry of Fair Value Gaps (Inefficiency Mitigation) ===
-Write continuous, brilliant spoken prose for all 5 movements now:"""
+        # Build Phase 1 Prompt dynamically
+        p1_lines = [
+            f"Write Movements 1 to 5 of an elite 16-minute Wall Street quantitative documentary masterclass on '{topic}'.",
+            f"Target Trading Sector: {sec_name}.",
+            "Structure strictly into these 5 movements, each with a full 240-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
+        ]
+        for title, cta in sec["movements_p1"]:
+            p1_lines.append(f"=== {title} ===")
+            if cta:
+                p1_lines.append(f"(MANDATORY CTA: {cta})")
+        p1_lines.append("Write continuous, brilliant spoken narration prose for all 5 movements now:")
+        p1_prompt = "\n".join(p1_lines)
 
-        print(f"  → Querying Groq Phase 1 (Movements 1-5) with Key #{(job_id - 1) % 2 + 1}...")
+        print(f"  → Querying Groq Phase 1 (Movements 1-5) via 120B Reasoning with Key #{(job_id - 1) % 2 + 1}...")
         try:
             p1_text = query_groq_api(p1_prompt, system_prompt, primary_key)
-        except Exception:
-            print("  ! Key 1 failed, rotating to Key 2...")
+        except Exception as e:
+            print(f"  ! Key 1 failed ({e}), rotating to Key 2...")
             p1_text = query_groq_api(p1_prompt, system_prompt, backup_key)
 
-        # Phase 2: Movements 6 to 10 (~1,200 words)
-        p2_prompt = f"""Write Movements 6 to 10 of an elite 16-minute financial documentary masterclass on '{topic}'.
-Structure strictly into these 5 movements, each with a full 230-word deeply analytical spoken paragraph:
-=== Movement 6: The Judas Swing Anatomy (London & NY Session Liquidity Raids) ===
-(MANDATORY CTA: Embed an institutional proof CTA forcing viewers to subscribe and enable notifications for raw London & NY order flow leaks.)
-=== Movement 7: Smart Money Technique (SMT) Intermarket Divergence ===
-=== Movement 8: The 3-Tier Precision Sniper Execution Playbook ===
-(MANDATORY CTA: Challenge viewers to comment their primary traded asset—Gold, EURUSD, or Indices—for deep order flow footprint review.)
-=== Movement 9: Asymmetric Expectancy Mathematics & The Kelly Criterion Proof ===
-=== Movement 10: The Sovereign Mindset: Stoic Deconstruction of the 1% Elite Operator ===
-(MANDATORY CTA: Deliver an empowering outro CTA demanding viewers like and subscribe to officially transition from retail prey to quantitative executioner.)
-Write continuous, brilliant spoken prose for all 5 movements now:"""
+        # Build Phase 2 Prompt dynamically
+        p2_lines = [
+            f"Write Movements 6 to 10 of an elite 16-minute Wall Street quantitative documentary masterclass on '{topic}'.",
+            f"Target Trading Sector: {sec_name}.",
+            "Structure strictly into these 5 movements, each with a full 240-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
+        ]
+        for title, cta in sec["movements_p2"]:
+            p2_lines.append(f"=== {title} ===")
+            if cta:
+                p2_lines.append(f"(MANDATORY CTA: {cta})")
+        p2_lines.append("Write continuous, brilliant spoken narration prose for all 5 movements now:")
+        p2_prompt = "\n".join(p2_lines)
 
-        print(f"  → Querying Groq Phase 2 (Movements 6-10)...")
+        print(f"  → Querying Groq Phase 2 (Movements 6-10) via 120B Reasoning...")
         try:
             p2_text = query_groq_api(p2_prompt, system_prompt, backup_key)
-        except Exception:
+        except Exception as e:
+            print(f"  ! Key 2 failed ({e}), rotating to Key 1...")
             p2_text = query_groq_api(p2_prompt, system_prompt, primary_key)
 
         full_script = f"{p1_text}\n\n{p2_text}"
         words = len(full_script.split())
         est_min = round(words / 140, 1)
-        print(f"✓ AI Script Complete via Groq! Total Words: {words} (~{est_min} minutes)")
+        print(f"✓ AI Script Complete via Groq 120B! Total Words: {words} (~{est_min} minutes)")
         if words > 1600:
             return full_script
     except Exception as e:
-        print(f"[!] Groq generation error ({e}). Deploying 1000x Flagship Procedural Vault...")
+        print(f"[!] Groq generation error ({e}). Deploying bespoke Sector Procedural Masterclass...")
 
+    if get_procedural_masterclass:
+        return get_procedural_masterclass(sec_key, topic)
     return generate_flagship_vault_script(topic)
 
-def generate_flagship_vault_script(topic: str) -> str:
-    """1000x Hard-Locked Procedural Masterclass Vault (~2,400 words / 16.5 minutes)."""
-    movements = [
-        (
-            "Movement 1: The Evolutionary Dopamine Trap (The Biological Conditioning of Retail Slaughter)",
-            f"When an aspiring retail trader logs into their broker's platform, they believe they are making independent, rational financial decisions. "
-            f"What they fail to comprehend is that they are stepping into the most sophisticated neuro-biological trap ever constructed by institutional engineering. "
-            f"For hundreds of thousands of years, the human limbic system evolved to survive physical predators by prioritizing immediate certainty, avoiding discomfort, and seeking social validation. "
-            f"In a continuous double auction market, every single one of these primal evolutionary survival mechanisms functions as a lethal financial liability. "
-            f"When a retail trade moves slightly into profit, the amateur's amygdala experiences a flood of fear—a visceral dread that the green numbers will vanish. "
-            f"To alleviate this psychological tension, they click close, harvesting a microscopic two-pip gain while congratulating themselves on their prudence. "
-            f"Conversely, when a trade enters severe negative drawdown, their ego refuses to accept the mathematical reality of loss. "
-            f"Instead of cutting the position at structural invalidation, they widen their stop-loss, average down into a collapsing asset, and pray for a breakeven exit. "
-            f"The tier-one market makers do not need to predict where price is going; they simply construct liquidity traps around these predictable retail biological reflexes. "
-            f"Before we dissect the mechanics, pause right now and drop a comment below with your single biggest drawdown. By the fourteenth minute of this masterclass, you will see why the liquidity pool targeted that exact dollar figure."
-        ),
-        (
-            "Movement 2: Microscopic Auction Theory & The Electronic Broking Service (EBS) Reality",
-            f"To achieve permanent longevity in modern finance, you must completely abandon the retail illusion of charting geometry and study raw market microstructure. "
-            f"The foreign exchange, sovereign debt, and equity index markets do not trade on TradingView or retail MetaTrader servers. "
-            f"They are matched at the speed of light across Electronic Broking Services (EBS), Reuters Matching, and the Chicago Mercantile Exchange central limit order book. "
-            f"In this high-frequency environment, every price tick is an auction event governed strictly by the interaction of passive resting limit orders and aggressive market liquidity. "
-            f"A market order is an impatient order: it pays the bid-ask spread to demand immediate execution, consuming resting liquidity from the book. "
-            f"A limit order is an institutional instrument: it provides liquidity, waiting patiently at deliberate price levels to accumulate inventory. "
-            f"When retail education teaches you that a horizontal line on a chart represents support, they are concealing the true mechanical reality. "
-            f"Support does not exist because a line was drawn by a technical analyst. It exists only when an institutional participant places resting limit bids of sufficient volume to absorb every aggressive market sell order arriving on the tape."
-        ),
-        (
-            "Movement 3: Order Book Engineering & Algorithmic Icebergs in Dark Pools",
-            f"Consider the logistical problem faced by a sovereign wealth fund or global macro hedge fund intending to accumulate seven hundred million dollars of long exposure. "
-            f"If an institutional execution desk were to route a seven hundred million dollar market buy order directly into the public order book, the order would sweep the thin resting asks instantly. "
-            f"Price would experience catastrophic slippage, causing the average execution fill to occur at an astronomical premium, destroying the fund's profit expectancy. "
-            f"Therefore, institutional algorithms are programmed to engineer liquidity through sophisticated dark pool routing and iceberg order slicing. "
-            f"An iceberg order displays only a tiny fraction of its total size—perhaps five contracts visible on Level 2 market depth—while concealing tens of thousands of contracts beneath the surface. "
-            f"Furthermore, the algorithm intentionally creates technical chart patterns that retail traders are conditioned to recognize. "
-            f"By engineering a clean double bottom or a visible trendline support, the algorithm incentivizes thousands of retail participants to enter long positions and place their protective stop-losses just beneath that obvious level. "
-            f"Those clustered stop-losses are not protective shields; to an institutional algorithm, they represent a high-density pool of concentrated market sell orders waiting to be harvested. "
-            f"Hit the like button right now if you have ever placed a stop-loss, watched price wick you out to the exact pip, and then explode towards your take-profit without you. What you experienced was an iceberg liquidity sweep."
-        ),
-        (
-            "Movement 4: The Displacement Footprint & Delta Volume Imbalance",
-            f"While institutional operators utilize sophisticated dark pools and algorithmic dispersion to mask their footprints, their physical capital volume makes complete invisibility impossible. "
-            f"When genuine smart money steps into the market, it leaves an indelible physical signature known as Institutional Displacement. "
-            f"Displacement is not a standard candlestick. It is a violent, high-momentum price impulse that expands price across multiple volatility ranges in a compressed timeframe. "
-            f"When you observe a single forty-pip candle slicing effortlessly through previously consolidated price action, you are witnessing the direct injection of institutional balance sheets. "
-            f"Retail traders are conditioned to fear this volatility, often attempting to fade the impulse by selling into the momentum, believing price has moved too far too fast. "
-            f"In contrast, the institutional operator monitors Cumulative Volume Delta (CVD) to measure the true balance of power behind the displacement. "
-            f"If an aggressive price impulse breaks market structure while volume footprint exhibits overwhelming positive absorption, it confirms that institutional capital has committed to the directional expansion."
-        ),
-        (
-            "Movement 5: The Mathematical Geometry of Fair Value Gaps (Inefficiency Mitigation)",
-            f"Whenever violent institutional displacement occurs, it inevitably fractures the symmetry of continuous two-sided auctioning. "
-            f"In the precision mechanics of Smart Money Concepts, this phenomenon is codified as a Fair Value Gap, or FVG. "
-            f"A Fair Value Gap emerges across a three-candle sequence where the extreme low of the first candle fails to overlap with the extreme high of the third candle. "
-            f"This structural void in the price delivery matrix represents a price zone where only aggressive market buying was executed, leaving resting sell orders completely unfulfilled. "
-            f"Central bank pricing algorithms are programmed under strict mandate to maintain orderly market delivery and auction efficiency across rolling settlement cycles. "
-            f"Consequently, price possesses an overwhelming mathematical tendency to retrace back into that imbalance zone to re-auction the unfilled limit orders before resuming its primary trajectory. "
-            f"Entering a position at the mitigation threshold of a Fair Value Gap allows the institutional operator to enter with precision, placing their stop-loss safely beyond the displacement anchor with minimal mathematical risk."
-        ),
-        (
-            "Movement 6: The Judas Swing Anatomy (London & NY Session Liquidity Raids)",
-            f"Price delivery in global financial markets is governed by time-based algorithmic parameters known as Session Killzones. "
-            f"During the Asian trading session, volume remains muted while the market forms a consolidated range, accumulating liquidity above the session highs and below the session lows. "
-            f"As the London session opens at eight A M London time, the algorithmic manipulation phase, historically designated as the Judas Swing, is initiated. "
-            f"The algorithm executes an aggressive price probe in the opposite direction of the true intended trend of the day. "
-            f"If the true daily objective is an expansion higher, the London open will violently spike downward, violating the Asian session low to trigger retail sell stop-losses and lure breakout traders into short positions. "
-            f"The moment retail liquidity is absorbed by resting institutional buy limits, the Judas Swing completes, and the genuine expansion trend of the day accelerates. "
-            f"When the New York session opens between eight A M and eleven A M Eastern Standard Time, global volume peaks, offering a second optimal entry window to ride institutional momentum. "
-            f"Subscribe to the channel right now and enable all notifications if you want our full institutional breakdown of London and New York session liquidity raids delivered before tomorrow's opening bell."
-        ),
-        (
-            "Movement 7: Smart Money Technique (SMT) Intermarket Divergence",
-            f"Institutional capital never operates within isolated financial silos. Large investment banks manage multi-asset global balance sheets, continuously hedging across correlated currency pairs, bond yields, and equity indices. "
-            f"By analyzing the microscopic divergence between correlated assets, an elite operator can identify institutional accumulation before it becomes visible on a single chart. "
-            f"This analytical edge is codified as Smart Money Technique, or SMT Divergence. "
-            f"Consider the inverse correlation between the US Dollar Index (DXY) and the EUR/USD currency pair. Under normal market conditions, if the Dollar Index creates a higher high, EUR/USD must mathematically create a lower low. "
-            f"However, when smart money is aggressively accumulating Euros, EUR/USD will refuse to make a lower low, forming a higher low while the Dollar Index sweeps into a new high. "
-            f"This intermarket crack in correlation is an incontrovertible tell: it reveals that institutional buying is actively absorbing European sovereign debt, telegraphing an explosive upward reversal."
-        ),
-        (
-            "Movement 8: The 3-Tier Precision Sniper Execution Playbook",
-            f"To eliminate emotional bias and erratic decision-making, we codify our analysis into a mechanical, non-negotiable three-tier execution playbook. "
-            f"Tier One is Liquidity Identification: Before touching the buy or sell button, you must identify where retail stops are mathematically clustered above equal highs or below equal lows. "
-            f"Tier Two is Liquidity Sweep with Market Structure Shift: You must patiently watch price raid that liquidity pool, followed immediately by an aggressive displacement candle that closes beyond the most recent swing point. "
-            f"Tier Three is Imbalance Mitigation Entry: You do not chase the market impulse. You place a resting limit order at the premium or discount boundary of the newly formed Fair Value Gap. "
-            f"Your stop-loss is placed strictly beyond the sweep anchor, providing an exact invalidation threshold with minimal pip risk, while your target is calibrated to the opposing institutional liquidity pool. "
-            f"This framework removes guesswork entirely, transforming trading into a calm, mechanical execution of probabilistic math. "
-            f"Comment below with the primary ticker you trade—whether it is Gold, EURUSD, or the S&P 500. We will analyze the highest-voted asset in our next private order flow footprint breakdown."
-        ),
-        (
-            "Movement 9: Asymmetric Expectancy Mathematics & The Kelly Criterion Proof",
-            f"Amateur retail traders obsess over their win rate, convinced that achieving an eighty percent strike rate is the prerequisite for financial freedom. "
-            f"Professional risk underwriters know that win rate without expectancy mathematics is a cognitive delusion that guarantees eventual account ruin. "
-            f"Under an asymmetric execution framework with a minimum of a one-to-three-point-five risk-to-reward ratio, mathematical expectancy dominates the outcome. "
-            f"With a one-to-three-point-five ratio, you can lose sixty-five out of every one hundred trades and still generate massive portfolio growth. "
-            f"Sixty-five losing trades at one unit of risk results in a negative sixty-five unit loss. Thirty-five winning trades at three-point-five units of profit results in a gross gain of one hundred and twenty-two point five units. "
-            f"Your net mathematical edge is positive fifty-seven point five units of pure profit. "
-            f"Furthermore, applying conservative fractional Kelly Criterion bet sizing ensures that your risk of ruin is mathematically zero, allowing your capital to compound exponentially through variance streaks."
-        ),
-        (
-            "Movement 10: The Sovereign Mindset: Stoic Deconstruction of the 1% Elite Operator",
-            f"The final barrier separating the perpetually losing ninety-nine percent from the elite one percent is not analytical; it is philosophical. "
-            f"The ninety-nine percent trade to satisfy emotional needs: they seek excitement, validation, dopamine, and the fantasy of rapid unearned wealth. "
-            f"The elite one percent trade with the emotional detachment of an actuary underwriting life insurance policies. "
-            f"They do not view money as status or security; they view money strictly as financial inventory allocated across probabilistic setups. "
-            f"When an individual trade hits its stop-loss, the elite operator experiences zero emotional distress, because an individual trade is merely one data point in a distribution of ten thousand trials. "
-            f"They understand that the market is an uncaring, neutral mathematical machine that transfers capital from the impatient and undisciplined to the patient and calculated. "
-            f"When you eliminate ego, embrace strict asymmetric risk, and execute with ruthless discipline, you cease to be market prey. You become the apex institutional predator. "
-            f"If this masterclass reshaped how you perceive market auctions forever, hit that like button and share this with a fellow trader who needs to stop bleeding capital. Subscribe to the channel now—you are no longer the hunted; you are the quantitative executioner."
-        )
-    ]
-
-    full = []
-    for title, text in movements:
-        full.append(f"=== {title} ===\n{text}")
-    return "\n\n".join(full)
+def generate_flagship_vault_script(topic: str, sec_key: str = "orderflow") -> str:
+    """Delegates to bespoke procedural sector vault."""
+    if get_procedural_masterclass:
+        return get_procedural_masterclass(sec_key, topic)
+    return f"Masterclass on {topic}."
 
 async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path: Path):
     """
@@ -560,7 +501,6 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             "-shortest",
             str(out_path)
         ], check=True)
-    subprocess.run(composite_cmd, check=True)
     print(f"\n🎉 16-MINUTE MASTERCLASS COMPLETED: {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
 def main():
@@ -570,13 +510,18 @@ def main():
     args = parser.parse_args()
 
     topic_item = ENGLISH_TOPIC_REGISTRY[(args.job_id - 1) % len(ENGLISH_TOPIC_REGISTRY)]
-    topic = topic_item["title"]
-    voice = topic_item["voice"]
     channel = topic_item["channel"]
+
+    # Dynamically resolve sector curriculum, voice, and topic
+    sec = resolve_sector(args.job_id, channel) if resolve_sector else None
+    sec_name = sec["name"] if sec else "Quantitative Order Flow"
+    voice = sec["voice"] if sec else topic_item["voice"]
+    topic = topic_item["title"]
 
     print("=" * 70)
     print(f"🚀 DISTRIBUTED CLUSTER RUNNER (15+ MIN) | Job #{args.job_id} | Batch: {args.batch_id}")
     print(f"📺 Target Channel: {channel}")
+    print(f"🏛️ Trading Sector: {sec_name}")
     print(f"🎙️ Voice Profile:  {voice}")
     print(f"🎯 Master Topic:   {topic}")
     print("=" * 70)
@@ -587,7 +532,7 @@ def main():
     time.sleep(jitter)
 
     # 1. 16-Minute Dual-Key Groq Script
-    script_content = generate_15min_script(topic, args.job_id)
+    script_content = generate_15min_script(topic, args.job_id, channel)
 
     # 2. Studio Neural Speech
     raw_voice_path = Path(f"output/voice_job_{args.job_id}.mp3")
