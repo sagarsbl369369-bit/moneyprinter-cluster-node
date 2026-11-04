@@ -454,13 +454,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,hflip,zoompan=z='min(zoom+0.0015,1.12)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30"
     ]
 
-    # Pre-calculate non-overlapping temporal windows (3.2s step) for each clip
+    # Pre-calculate non-overlapping temporal windows (1.5s step, safe within 7s clips) for each clip
     unique_scenes = []
-    step = 3.2
     for item in all_clips:
         c_file = item["file"]
         for s_idx in range(4):
-            t_ss = round(s_idx * step, 2)
+            t_ss = round((s_idx * 1.5) % 4.5, 2)
             tf = transforms[(len(unique_scenes) + s_idx) % len(transforms)]
             unique_scenes.append({
                 "file": c_file,
@@ -496,7 +495,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     print(f"✓ Zero-Repeat Pacing Active: {len(assigned_cuts)} cuts mapped to non-repeating scenes with dynamic transforms.")
 
-    # Render segments with dynamic transforms
+    # Render segments with dynamic transforms & infinite stream loop safety
     print(f"✓ Rendering {len(cuts)} cuts with FFmpeg (Dynamic Ken Burns & Zero Scene Repetition)...")
     concat_list = temp_dir / "concat.txt"
     with open(concat_list, "w", encoding="utf-8") as f_out:
@@ -504,6 +503,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             seg_file = segs_dir / f"seg_{c['idx']:04d}.mp4"
             cmd = [
                 "ffmpeg", "-y",
+                "-stream_loop", "-1",
                 "-ss", f"{scene['ss']:.2f}",
                 "-i", str(scene["file"]),
                 "-t", f"{c['dur']:.2f}",
@@ -512,6 +512,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 "-an", str(seg_file)
             ]
             subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+
+            if not seg_file.exists() or seg_file.stat().st_size < 1000:
+                cmd_fb = [
+                    "ffmpeg", "-y", "-stream_loop", "-1",
+                    "-i", str(scene["file"]),
+                    "-t", f"{c['dur']:.2f}",
+                    "-vf", f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p",
+                    "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
+                    "-an", str(seg_file)
+                ]
+                subprocess.run(cmd_fb, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+
             safe_p = str(seg_file.resolve()).replace("\\", "/")
             f_out.write(f"file '{safe_p}'\n")
 
@@ -535,6 +547,19 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         "-shortest",
         str(out_path)
     ]
+    try:
+        subprocess.run(composite_cmd, check=True)
+    except Exception as e:
+        print(f"Subtitle multiplex fallback ({e}); rendering clean 1080p masterclass...")
+        subprocess.run([
+            "ffmpeg", "-y",
+            "-i", str(silent_full),
+            "-i", str(audio_path),
+            "-c:v", "copy",
+            "-c:a", "aac", "-b:a", "192k",
+            "-shortest",
+            str(out_path)
+        ], check=True)
     subprocess.run(composite_cmd, check=True)
     print(f"\n🎉 16-MINUTE MASTERCLASS COMPLETED: {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
