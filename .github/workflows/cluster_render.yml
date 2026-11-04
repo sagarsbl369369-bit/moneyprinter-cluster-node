@@ -1,4 +1,4 @@
-name: Cluster Masterclass Generation (20 Concurrent Runners)
+name: Cluster Masterclass Generation (20 Concurrent Runners - 15+ Min)
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       batch_id:
         description: 'Batch Identifier'
         required: true
-        default: 'batch_001'
+        default: 'batch_15min_001'
       start_index:
         description: 'Global Video Start Index'
         required: true
@@ -41,13 +41,13 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Download Verified Pure Financial Assets
+      - name: Download Verified Pure Financial Assets & BGM (v2.0.0)
         run: |
-          curl -L -o assets.zip https://github.com/sagarsbl369369-bit/moneyprinter-cluster-node/releases/download/v1.0.0/trading_assets.zip
+          curl -L -o assets.zip https://github.com/sagarsbl369369-bit/moneyprinter-cluster-node/releases/download/v2.0.0/trading_assets_v2.zip
           unzip -q assets.zip -d assets/
           ls -la assets/
 
-      - name: Execute Autonomous Video Generation
+      - name: Execute Autonomous 15+ Min Video Generation
         run: |
           python runner.py \
             --job-id ${{ matrix.job_id }} \
@@ -56,6 +56,6 @@ jobs:
       - name: Upload Masterclass Video Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: video-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          name: video-16min-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
           path: output/*.mp4
           retention-days: 3
