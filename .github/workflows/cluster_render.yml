@@ -41,9 +41,13 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Download Verified Pure Financial Assets
+        run: |
+          curl -L -o assets.zip https://github.com/sagarsbl369369-bit/moneyprinter-cluster-node/releases/download/v1.0.0/trading_assets.zip
+          unzip -q assets.zip -d assets/
+          ls -la assets/
+
       - name: Execute Autonomous Video Generation
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
         run: |
           python runner.py \
             --job-id ${{ matrix.job_id }} \
