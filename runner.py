@@ -12,48 +12,28 @@ import urllib.error
 
 import edge_tts
 
-# 🎬 8 High-Retention English Psychological Trading Topics & Channel Routing
+# 🎬 20 High-Retention Institutional Trading Topics (1 for each Matrix Runner)
 ENGLISH_TOPIC_REGISTRY = [
-    {
-        "title": "Why 99% Of Traders Fail: The Biological Conditioning Of Retail Slaughter",
-        "voice": "en-US-ChristopherNeural",
-        "channel": "SmartMoneyAlpha"
-    },
-    {
-        "title": "The Order Block Playbook: How Central Banks Accumulate Billions Discreetly",
-        "voice": "en-US-GuyNeural",
-        "channel": "OrderBlockElite"
-    },
-    {
-        "title": "Fair Value Gaps Revealed: Exploiting Institutional Price Delivery Inefficiencies",
-        "voice": "en-GB-RyanNeural",
-        "channel": "FairValueGapHQ"
-    },
-    {
-        "title": "London & New York Killzones: How Algorithms Hunt Retail Stop-Losses At Open",
-        "voice": "en-US-EricNeural",
-        "channel": "KillzoneSniper"
-    },
-    {
-        "title": "The 1:3.5 Asymmetric Risk Model: Why 35% Win Rate Generates Millions",
-        "voice": "en-US-ChristopherNeural",
-        "channel": "RiskRewardMaster"
-    },
-    {
-        "title": "Dark Pools And Iceberg Orders: Reading Hidden Institutional Footprints",
-        "voice": "en-US-GuyNeural",
-        "channel": "InstitutionalFlow"
-    },
-    {
-        "title": "Candlestick Psychology: What High-Frequency Market Makers Hide Behind The Wicks",
-        "voice": "en-GB-RyanNeural",
-        "channel": "CandlePsychology"
-    },
-    {
-        "title": "The Top 1% Trader Mindset: Eliminating Cognitive Bias In High-Stakes Execution",
-        "voice": "en-US-EricNeural",
-        "channel": "TopOnePercentTrader"
-    }
+    {"title": "Why 99% Of Traders Fail: The Biological Conditioning Of Retail Slaughter", "voice": "en-US-ChristopherNeural", "channel": "SmartMoneyAlpha"},
+    {"title": "The Order Block Playbook: How Central Banks Accumulate Billions Discreetly", "voice": "en-US-GuyNeural", "channel": "OrderBlockElite"},
+    {"title": "Fair Value Gaps Revealed: Exploiting Institutional Price Delivery Inefficiencies", "voice": "en-GB-RyanNeural", "channel": "FairValueGapHQ"},
+    {"title": "London & New York Killzones: How Algorithms Hunt Retail Stop-Losses At Open", "voice": "en-US-EricNeural", "channel": "KillzoneSniper"},
+    {"title": "The 1:3.5 Asymmetric Risk Model: Why 35% Win Rate Generates Millions", "voice": "en-US-ChristopherNeural", "channel": "RiskRewardMaster"},
+    {"title": "Dark Pools And Iceberg Orders: Reading Hidden Institutional Footprints", "voice": "en-US-GuyNeural", "channel": "InstitutionalFlow"},
+    {"title": "Candlestick Psychology: What High-Frequency Market Makers Hide Behind The Wicks", "voice": "en-GB-RyanNeural", "channel": "CandlePsychology"},
+    {"title": "The Top 1% Trader Mindset: Eliminating Cognitive Bias In High-Stakes Execution", "voice": "en-US-EricNeural", "channel": "TopOnePercentTrader"},
+    {"title": "The Global Yen Carry Trade Liquidation: How Multilateral Swaps Trigger Forex Flash Crashes", "voice": "en-US-GuyNeural", "channel": "YenCarryWatch"},
+    {"title": "Federal Reserve Overnight Reverse Repo Drain: The Invisible Liquidity Vacuum Crushing Equities", "voice": "en-US-ChristopherNeural", "channel": "FedLiquidityVault"},
+    {"title": "The 96% Prop Firm Slaughterhouse: Mathematical Proof Why Simulated Drawdown Rules Are Rigged", "voice": "en-GB-RyanNeural", "channel": "PropFirmExposed"},
+    {"title": "Balanced Price Ranges (BPR) & Inefficient Price Delivery: The Exact Algorithm Signature", "voice": "en-US-EricNeural", "channel": "BPRSniper"},
+    {"title": "SMT Divergence Architecture: Spotting Smart Money Accumulation at Major Lows", "voice": "en-US-GuyNeural", "channel": "SMTDivergenceHQ"},
+    {"title": "Cumulative Volume Delta (CVD) Absorption: Reading Wall Street Footprints Inside Limit Orders", "voice": "en-US-ChristopherNeural", "channel": "DeltaFlowAlpha"},
+    {"title": "High-Frequency Algorithmic Stop-Loss Hunting: How Modern Matching Engines Front-Run Retail Bids", "voice": "en-GB-RyanNeural", "channel": "HFTAlgorithms"},
+    {"title": "Auction Market Theory & The Value Area: Why Price Gravitates to Point of Control", "voice": "en-US-EricNeural", "channel": "AuctionTheoryHQ"},
+    {"title": "Synthetic Spread Expansion: How B-Book Brokers Induce Margin Calls During CPI News", "voice": "en-US-GuyNeural", "channel": "SpreadHunter"},
+    {"title": "The London Judas Swing Breakdown: Catching the False 08:30 GMT Expansion", "voice": "en-US-ChristopherNeural", "channel": "JudasSwingPro"},
+    {"title": "Gold ATH Liquidity Sweeps: How Tier-1 Banks Engineer Clean High Breaks", "voice": "en-GB-RyanNeural", "channel": "GoldMicrostructure"},
+    {"title": "The Sovereign Mindset: Stoic Deconstruction of the 1% Elite Executioner", "voice": "en-US-EricNeural", "channel": "SovereignTrader"}
 ]
 
 # 🔑 DUAL-KEY LOAD BALANCING POOL (B64 encoded to pass secret scanning)
@@ -80,7 +60,7 @@ def query_groq_api(prompt: str, system_prompt: str, key: str) -> str:
                         {"role": "system", "content": system_prompt},
                         {"role": "user", "content": prompt}
                     ],
-                    "max_tokens": 2048,
+                    "max_tokens": 4096,
                     "temperature": 0.7
                 }).encode("utf-8")
             )
@@ -466,12 +446,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     transforms = [
         "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080",
-        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0016,1.15)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'",
+        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0016,1.15)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30",
         "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,hflip",
         "crop=1550:872:100:100,scale=1920:1080",
-        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='max(1.15-0.0014*on,1.0)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'",
+        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='max(1.15-0.0014*on,1.0)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30",
         "crop=1550:872:iw-1550:ih-872,scale=1920:1080",
-        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,hflip,zoompan=z='min(zoom+0.0015,1.12)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
+        "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,hflip,zoompan=z='min(zoom+0.0015,1.12)':d=125:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30"
     ]
 
     # Pre-calculate non-overlapping temporal windows (3.2s step) for each clip
@@ -527,7 +507,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 "-ss", f"{scene['ss']:.2f}",
                 "-i", str(scene["file"]),
                 "-t", f"{c['dur']:.2f}",
-                "-vf", f"{scene['tf']},fps=30,format=yuv420p",
+                "-vf", f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p",
                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
                 "-an", str(seg_file)
             ]
@@ -535,9 +515,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             safe_p = str(seg_file.resolve()).replace("\\", "/")
             f_out.write(f"file '{safe_p}'\n")
 
-    # Lossless Concat
+    # Lossless Concat with automatic fallback
     silent_full = temp_dir / "silent_full.mp4"
-    subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), "-c", "copy", str(silent_full)], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    res = subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), "-c", "copy", str(silent_full)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if res.returncode != 0:
+        print("  -> Concat stream-copy flagged; executing fast ultrafast concat fallback...")
+        subprocess.run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(concat_list), "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22", "-pix_fmt", "yuv420p", str(silent_full)], check=True)
 
     # Multiplex with ASS subtitles and ducked audio
     print(f"\n[5/5] Final Multiplexing & Kinetic Subtitle Burn...")
