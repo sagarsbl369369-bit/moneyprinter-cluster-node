@@ -377,7 +377,7 @@ PlayResY: 1080
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Liberation Sans,Arial,DejaVu Sans,44,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,3.5,2,2,40,40,75,1
+Style: Default,DejaVu Sans,44,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,3.5,2,2,40,40,75,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -520,8 +520,9 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     # Multiplex with ASS subtitles and ducked audio
     print(f"\n[5/5] Final Multiplexing & Kinetic Subtitle Burn...")
-    ass_esc = str(ass_path.resolve()).replace("\\", "/").replace(":", "\\:")
-    sub_filter = f"subtitles='{ass_esc}'" if os.name == "nt" else f"subtitles='{ass_path.name}'"
+    # Safe relative POSIX path for subtitles filter on Linux/Windows
+    sub_path_posix = str(ass_path.as_posix())
+    sub_filter = f"subtitles='{sub_path_posix}'"
     composite_cmd = [
         "ffmpeg", "-y",
         "-i", str(silent_full),
