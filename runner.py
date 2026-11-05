@@ -483,7 +483,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         "-i", str(silent_full),
         "-i", str(audio_path),
         "-vf", f"subtitles='{ass_esc}'",
-        "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22",
+        "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
         "-shortest",
         str(out_path)
@@ -496,7 +496,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
             "ffmpeg", "-y",
             "-i", str(silent_full),
             "-i", str(audio_path),
-            "-c:v", "copy",
+            "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-pix_fmt", "yuv420p",
             "-c:a", "aac", "-b:a", "192k",
             "-shortest",
             str(out_path)
@@ -507,6 +507,7 @@ def main():
     parser = argparse.ArgumentParser(description="Distributed Cluster Node Runner 15+ Min")
     parser.add_argument("--job-id", type=int, default=1, help="Matrix job ID (1..20)")
     parser.add_argument("--batch-id", type=str, default="batch_001", help="Batch Identifier")
+    parser.add_argument("--auto-publish-rumble", action="store_true", help="Directly publish to Rumble from cloud")
     args = parser.parse_args()
 
     topic_item = ENGLISH_TOPIC_REGISTRY[(args.job_id - 1) % len(ENGLISH_TOPIC_REGISTRY)]
@@ -549,6 +550,17 @@ def main():
     # 5. Final 16-Minute Masterclass Assembly
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
     render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video)
+
+    # 6. Direct Cloud-to-Rumble Publishing (Azure 10 Gbps Pipe)
+    should_publish = args.auto_publish_rumble or (os.environ.get("AUTO_PUBLISH_RUMBLE", "").lower() == "true")
+    if should_publish:
+        try:
+            from rumble_cloud_publisher import publish_video_from_cloud
+            live_url = publish_video_from_cloud(out_video, args.job_id, channel, topic)
+            if live_url:
+                print(f"[✓] Direct Cloud Publish Succeeded: {live_url}")
+        except Exception as e:
+            print(f"[CloudPublisher] ⚠️ Error during direct cloud publish: {e}")
 
     print(f"\n[✓] Job #{args.job_id} Completed Successfully! (15+ Min Masterpiece)")
 
