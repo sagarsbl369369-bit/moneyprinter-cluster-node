@@ -306,7 +306,7 @@ def load_verified_assets(assets_dir: Path):
     return hero_clips, bridge_clips, bgm_path
 
 def generate_procedural_trading_chart(topic: str, out_path: Path, chart_index: int = 1):
-    """Generates an ultra-crisp 1920x1080 institutional technical candlestick chart slide."""
+    """Generates 8 distinct institutional quantitative technical chart types (1920x1080)."""
     try:
         from PIL import Image, ImageDraw
     except ImportError:
@@ -315,92 +315,197 @@ def generate_procedural_trading_chart(topic: str, out_path: Path, chart_index: i
         from PIL import Image, ImageDraw
 
     w, h = 1920, 1080
-    bg_colors = [(11, 15, 23), (14, 18, 28), (8, 12, 20), (12, 16, 26)]
+    bg_colors = [(10, 14, 22), (12, 17, 26), (8, 12, 20), (14, 18, 28)]
     bg_col = bg_colors[chart_index % len(bg_colors)]
     img = Image.new("RGB", (w, h), color=bg_col)
     draw = ImageDraw.Draw(img)
 
     # 1. Subtle Terminal Grid Lines
     for x in range(0, w, 80):
-        draw.line([(x, 80), (x, h - 80)], fill=(22, 30, 46), width=1)
+        draw.line([(x, 80), (x, h - 80)], fill=(20, 28, 42), width=1)
     for y in range(80, h - 80, 60):
-        draw.line([(0, y), (w, y)], fill=(22, 30, 46), width=1)
+        draw.line([(0, y), (w, y)], fill=(20, 28, 42), width=1)
 
     # 2. Header HUD Bar
-    draw.rectangle([(0, 0), (w, 70)], fill=(16, 22, 35))
+    draw.rectangle([(0, 0), (w, 70)], fill=(15, 21, 33))
     draw.line([(0, 70), (w, 70)], fill=(0, 215, 255), width=2)
-    draw.text((40, 22), "INSTITUTIONAL LIQUIDITY RADAR // TIER-1 MATCHING ENGINE", fill=(0, 215, 255))
-    draw.text((750, 22), f"ASSET: ES1! (E-MINI S&P) | 5M | {topic[:40].upper()}", fill=(200, 215, 235))
-    draw.text((1650, 22), "● LIVE CME GLOBEX", fill=(0, 255, 136))
+    draw.text((40, 24), "INSTITUTIONAL QUANTITATIVE RADAR // TIER-1 MATCHING ENGINE", fill=(0, 215, 255))
+    draw.text((750, 24), f"ASSET: ES1! (E-MINI S&P 500) | 5M | {topic[:38].upper()}", fill=(200, 215, 235))
+    draw.text((1650, 24), "● LIVE CME GLOBEX", fill=(0, 255, 136))
 
-    # 3. Candlesticks (30 realistic candles with wicks)
-    candles = []
-    curr = 5850.0 + (chart_index * 15.0)
-    for i in range(26):
-        change = random.uniform(-9.0, 10.5)
-        o = curr
-        c = o + change
-        h_val = max(o, c) + random.uniform(1.5, 7.0)
-        l_val = min(o, c) - random.uniform(1.5, 7.0)
-        curr = c
-        candles.append((o, c, h_val, l_val))
+    # Variant Types based on chart_index (0..7)
+    c_type = (chart_index - 1) % 8
 
-    start_x = 120
-    candle_w = 36
-    spacing = 60
-    all_prices = [p for c in candles for p in c]
-    min_p, max_p = min(all_prices) - 5, max(all_prices) + 5
-    p_range = max_p - min_p if max_p != min_p else 1.0
+    if c_type == 2:  # LEVEL 2 DEPTH OF MARKET (DOM) LADDER
+        draw.text((120, 110), "LEVEL 2 DEPTH OF MARKET (DOM) // ORDER BOOK TOPOGRAPHY", fill=(0, 215, 255))
+        cx = 960
+        base_p = 5870.0
+        draw.rectangle([(cx - 380, 160), (cx + 380, 880)], fill=(13, 18, 28), outline=(35, 48, 70), width=2)
+        draw.line([(cx - 380, 210), (cx + 380, 210)], fill=(0, 215, 255), width=2)
+        draw.text((cx - 340, 175), "BID SIZE (LIMITS)", fill=(0, 255, 136))
+        draw.text((cx - 50, 175), "PRICE (USD)", fill=(255, 255, 255))
+        draw.text((cx + 180, 175), "ASK SIZE (OFFERS)", fill=(255, 59, 48))
 
-    def py(price):
-        return int((h - 220) - ((price - min_p) / p_range) * (h - 380))
+        for row in range(14):
+            ry = 230 + row * 45
+            p_val = f"{base_p + (7 - row) * 0.25:.2f}"
+            is_bid = row >= 7
+            col = (0, 230, 118) if is_bid else (255, 59, 48)
+            vol = random.randint(450, 2800) if row in [3, 10] else random.randint(30, 420)
+            bar_w = int((vol / 2800) * 280)
+            if is_bid:
+                draw.rectangle([(cx - 100 - bar_w, ry), (cx - 100, ry + 32)], fill=(0, 100, 50))
+                draw.text((cx - 120 - bar_w, ry + 6), str(vol), fill=(0, 255, 136))
+            else:
+                draw.rectangle([(cx + 100, ry), (cx + 100 + bar_w, ry + 32)], fill=(120, 20, 20))
+                draw.text((cx + 110 + bar_w, ry + 6), str(vol), fill=(255, 100, 100))
 
-    for idx, (o, c, high, low) in enumerate(candles):
-        cx = start_x + idx * spacing
-        is_green = c >= o
-        col = (0, 230, 118) if is_green else (255, 59, 48)
-        draw.line([(cx + candle_w // 2, py(high)), (cx + candle_w // 2, py(low))], fill=col, width=3)
-        top_y, bot_y = min(py(o), py(c)), max(py(o), py(c))
-        if bot_y == top_y: bot_y += 2
-        draw.rectangle([(cx, top_y), (cx + candle_w, bot_y)], fill=col)
+            draw.text((cx - 45, ry + 6), p_val, fill=(240, 240, 240))
+            if vol > 1500:
+                draw.rectangle([(cx - 360, ry - 2), (cx + 360, ry + 34)], outline=(255, 215, 0), width=2)
+                draw.text((cx + 250, ry + 6), "★ ICEBERG DETECTED", fill=(255, 215, 0))
 
-    # 4. Institutional Annotations
-    ob_idx = 10 + (chart_index % 8)
-    ob_x = start_x + ob_idx * spacing
-    ob_y1, ob_y2 = py(candles[ob_idx][2]) - 10, py(candles[ob_idx][3]) + 10
-    draw.rectangle([(ob_x - 10, ob_y1), (ob_x + 280, ob_y2)], outline=(0, 215, 255), width=2)
-    labels = [
-        "★ INSTITUTIONAL ORDER BLOCK (UNMITIGATED)",
-        "▲ FAIR VALUE GAP (FVG IMBALANCE ZONE)",
-        "◆ BALANCED PRICE RANGE (BPR RETEST)",
-        "▼ SELL-SIDE LIQUIDITY PURGE (STOP HUNT)",
-        "● CVD AGGRESSIVE ABSORPTION WALL"
-    ]
-    draw.text((ob_x, ob_y1 - 25), labels[chart_index % len(labels)], fill=(0, 215, 255))
+    elif c_type == 3:  # CVD ABSORPTION FOOTPRINT
+        draw.text((120, 110), "CUMULATIVE VOLUME DELTA (CVD) // LIMIT ABSORPTION MATRIX", fill=(0, 215, 255))
+        points = []
+        cvd_val = 0
+        for i in range(24):
+            cvd_val += random.randint(-450, 600)
+            px = 180 + i * 65
+            py = int(540 - (cvd_val / 3000) * 220)
+            py = max(200, min(800, py))
+            points.append((px, py))
+        
+        for i in range(len(points) - 1):
+            col = (0, 255, 136) if points[i+1][1] < points[i][1] else (255, 59, 48)
+            draw.line([points[i], points[i+1]], fill=col, width=4)
+            draw.ellipse([(points[i][0]-4, points[i][1]-4), (points[i][0]+4, points[i][1]+4)], fill=(0, 215, 255))
+
+        draw.rectangle([(1100, 240), (1750, 480)], fill=(14, 20, 32), outline=(0, 215, 255), width=2)
+        draw.text((1130, 270), "INSTITUTIONAL DELTA ABSORPTION SIGNATURE:", fill=(255, 215, 0))
+        draw.text((1130, 320), "• Aggressive Market Buyers: +4,820 Contracts", fill=(0, 255, 136))
+        draw.text((1130, 360), "• Passive Limit Resistance: Absorbing At 5882.50", fill=(255, 100, 100))
+        draw.text((1130, 400), "• SMT Divergence Detected: Bearish Delta Absorption", fill=(0, 215, 255))
+
+    elif c_type == 5:  # 1:3.5 ASYMMETRIC RISK MODEL
+        draw.text((120, 110), "ASYMMETRIC RISK ARCHITECTURE // POSITIVE MATHEMATICAL EXPECTANCY", fill=(0, 255, 136))
+        draw.rectangle([(400, 240), (1520, 480)], fill=(0, 60, 30), outline=(0, 255, 136), width=2)
+        draw.text((430, 260), "PROFIT TARGET ZONE: +45.50 HANDLES (+3.5R GAIN)", fill=(0, 255, 136))
+        draw.text((430, 320), "MONETARY PAYOFF: $22,750 (PER 10 ES CONTRACTS)", fill=(255, 255, 255))
+        draw.text((430, 380), "EXIT MECHANISM: PREVIOUS DAY LIQUIDITY POOL", fill=(180, 200, 220))
+
+        draw.line([(380, 480), (1540, 480)], fill=(255, 215, 0), width=3)
+        draw.text((430, 490), "INSTITUTIONAL ENTRY: 5865.00 (DISPLACEMENT FVG RETEST)", fill=(255, 215, 0))
+
+        draw.rectangle([(400, 520), (1520, 620)], fill=(60, 15, 15), outline=(255, 59, 48), width=2)
+        draw.text((430, 540), "INVALIDATION STOP LOSS: -13.00 HANDLES (-1.0R RISK)", fill=(255, 59, 48))
+        draw.text((430, 580), "MAX DRAWDOWN LOSS: $6,500 (STRICT CANDLE BODY INVALIDATION)", fill=(255, 180, 180))
+
+        draw.rectangle([(400, 680), (1520, 800)], fill=(16, 22, 35), outline=(0, 215, 255), width=2)
+        draw.text((430, 710), "MATHEMATICAL EXPECTANCY FORMULA: EV = (Win% * 3.5R) - (Loss% * 1.0R)", fill=(0, 215, 255))
+        draw.text((430, 750), "At 35% Win Rate: EV = (0.35 * 3.5) - (0.65 * 1.0) = +0.575R PROFIT PER TRADE", fill=(0, 255, 136))
+
+    else:  # CANDLESTICKS (FVG, Order Blocks, Liquidity Sweeps, Killzones, Macro)
+        candles = []
+        curr = 5850.0 + (chart_index * 15.0)
+        for i in range(26):
+            change = random.uniform(-10.0, 11.5)
+            o = curr
+            c = o + change
+            h_val = max(o, c) + random.uniform(1.5, 7.0)
+            l_val = min(o, c) - random.uniform(1.5, 7.0)
+            curr = c
+            candles.append((o, c, h_val, l_val))
+
+        start_x = 120
+        candle_w = 36
+        spacing = 60
+        all_prices = [p for c in candles for p in c]
+        min_p, max_p = min(all_prices) - 5, max(all_prices) + 5
+        p_range = max_p - min_p if max_p != min_p else 1.0
+
+        def py(price):
+            return int((h - 220) - ((price - min_p) / p_range) * (h - 380))
+
+        for idx, (o, c, high, low) in enumerate(candles):
+            cx = start_x + idx * spacing
+            is_green = c >= o
+            col = (0, 230, 118) if is_green else (255, 59, 48)
+            draw.line([(cx + candle_w // 2, py(high)), (cx + candle_w // 2, py(low))], fill=col, width=3)
+            top_y, bot_y = min(py(o), py(c)), max(py(o), py(c))
+            if bot_y == top_y: bot_y += 2
+            draw.rectangle([(cx, top_y), (cx + candle_w, bot_y)], fill=col)
+
+        ob_idx = 10 + (chart_index % 8)
+        ob_x = start_x + ob_idx * spacing
+        ob_y1, ob_y2 = py(candles[ob_idx][2]) - 10, py(candles[ob_idx][3]) + 10
+        draw.rectangle([(ob_x - 10, ob_y1), (ob_x + 320, ob_y2)], outline=(0, 215, 255), width=2)
+        labels = [
+            "★ INSTITUTIONAL ORDER BLOCK (UNMITIGATED)",
+            "▲ FAIR VALUE GAP (FVG IMBALANCE ZONE)",
+            "◆ BALANCED PRICE RANGE (BPR RETEST)",
+            "▼ SELL-SIDE LIQUIDITY PURGE (STOP HUNT)",
+            "● CVD AGGRESSIVE ABSORPTION WALL",
+            "⚡ 0DTE GAMMA EXPOSURE (GEX) VOLATILITY FLIP",
+            "🏛️ CENTRAL BANK REVERSE REPO LIQUIDITY DRAIN",
+            "🎯 LONDON / NY KILLZONE JUDAS SWING EXPANSION"
+        ]
+        draw.text((ob_x, ob_y1 - 25), labels[chart_index % len(labels)], fill=(0, 215, 255))
 
     # 5. Footer HUD
-    draw.rectangle([(0, h - 70), (w, h)], fill=(16, 22, 35))
+    draw.rectangle([(0, h - 70), (w, h)], fill=(15, 21, 33))
     draw.line([(0, h - 70), (w, h - 70)], fill=(0, 215, 255), width=2)
-    draw.text((40, h - 48), "RISK/REWARD: 1:3.8 | INVALIDATION: STRICT CANDLE CLOSE | TARGET: +45 HANDLES", fill=(0, 255, 136))
-    draw.text((1480, h - 48), "QUANTITATIVE RESEARCH // WALL STREET ALPHA", fill=(150, 170, 200))
+    draw.text((40, h - 46), "RISK/REWARD: 1:3.8 | INVALIDATION: STRICT CANDLE CLOSE | TARGET: +45 HANDLES", fill=(0, 255, 136))
+    draw.text((1480, h - 46), "QUANTITATIVE RESEARCH // WALL STREET ALPHA", fill=(150, 170, 200))
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     img.save(str(out_path), quality=95)
 
+def get_cut_semantic_category(spoken_words: str) -> str:
+    """Categorizes spoken words in a cut window to ensure 200% Audio-Visual Semantic Matching."""
+    w = spoken_words.lower()
+    if any(k in w for k in ["liquidat", "stop loss", "hunt", "trap", "margin", "crash", "plunge", "slaughter", "loss", "purge", "flush", "wipe"]):
+        return "liquidity_purge"
+    if any(k in w for k in ["depth of market", "dom", "level 2", "cvd", "delta", "limit order", "passive", "absorption", "iceberg", "order book", "tape", "bid", "ask"]):
+        return "dom_ladder"
+    if any(k in w for k in ["order block", "fvg", "fair value", "imbalance", "bpr", "candlestick", "wick", "zone", "retest", "entry", "rejection"]):
+        return "order_block"
+    if any(k in w for k in ["risk", "reward", "win rate", "35%", "asymmetric", "math", "ratio", "expectancy", "drawdown", "prop firm"]):
+        return "risk_reward"
+    if any(k in w for k in ["fed", "federal reserve", "central bank", "powell", "inflation", "treasury", "repo", "interest rate", "dollar", "billion", "macro", "vacuum"]):
+        return "macro_liquidity"
+    if any(k in w for k in ["london", "new york", "killzone", "session", "judas", "08:30", "open"]):
+        return "killzones"
+    if any(k in w for k in ["algo", "algorithm", "hft", "server", "code", "latency", "matching engine"]):
+        return "algo_tech"
+    if any(k in w for k in ["mindset", "psychology", "discipline", "retail", "fear", "greed", "cognitive", "1%", "elite", "sovereign", "patience"]):
+        return "mindset"
+    return "general_market"
+
 def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = ""):
-    """Assembles 5 to 6-minute Fast Alpha Masterclass with Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
-    print(f"\n[4/5] Executing Waveform Retention Video Assembly (5-6 Min Fast Alpha Mode)...")
+    """Assembles 5 to 6-minute Fast Alpha Masterclass with 200% Smart Audio-Visual Matching, Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
+    print(f"\n[4/5] Executing 200% Smart Semantic Audio-Visual Assembly (5-6 Min Fast Alpha Mode)...")
     temp_dir = Path("temp_render")
     segs_dir = temp_dir / "segments"
     segs_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # 4.2 Splicing Procedural Candlestick Technical Charts into Visual Pool (Eliminates Scene Repetition)
+    # 4.2 Splicing 8 Distinct Procedural Candlestick & Order Book Technical Charts into Visual Pool
     charts_dir = temp_dir / "charts"
     charts_dir.mkdir(parents=True, exist_ok=True)
-    chart_clips = []
-    print("  → Splicing 4 bespoke institutional technical charts into hero visual pool...")
-    for c_i in range(1, 5):
+    semantic_charts = {}
+    print("  → Splicing 8 bespoke institutional technical charts (DOM, CVD, FVG, Risk) into visual pool...")
+    chart_category_map = [
+        "order_block",       # chart 1: FVG Imbalance
+        "order_block",       # chart 2: Order Block Purge
+        "dom_ladder",        # chart 3: Level 2 DOM Ladder
+        "dom_ladder",        # chart 4: CVD Absorption Footprint
+        "liquidity_purge",   # chart 5: Sell-Side Purge
+        "risk_reward",       # chart 6: 1:3.5 Asymmetric Risk
+        "killzones",         # chart 7: Session Open Killzones
+        "macro_liquidity"    # chart 8: Central Bank Reverse Repo
+    ]
+    for c_i in range(1, 9):
         try:
             chart_img = charts_dir / f"chart_{c_i}.jpg"
             generate_procedural_trading_chart(topic, chart_img, c_i)
@@ -408,16 +513,17 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
             subprocess.run([
                 "ffmpeg", "-y", "-loop", "1",
                 "-i", str(chart_img),
-                "-t", "3.2",
-                "-vf", "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0014,1.10)':d=96:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p",
+                "-t", "3.4",
+                "-vf", "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0014,1.10)':d=102:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p",
                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22",
                 "-an", str(chart_mp4)
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            chart_clips.append(chart_mp4)
+            cat = chart_category_map[c_i - 1]
+            if cat not in semantic_charts:
+                semantic_charts[cat] = []
+            semantic_charts[cat].append(chart_mp4)
         except Exception as ce:
             print(f"  ! Procedural chart #{c_i} error: {ce}")
-    if chart_clips:
-        hero_clips = hero_clips + chart_clips
 
     # Audio duration
     probe_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(audio_path)]
@@ -546,31 +652,60 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                 "scene_id": f"{c_file.stem}_s{s_idx}"
             })
 
-    # Shuffle deterministically to distribute scenes across the 16-minute timeline
+    # Shuffle deterministically to distribute scenes across the timeline
     rng = random.Random(cuts[0]["idx"] if cuts else 42)
     rng.shuffle(unique_scenes)
 
-    # Assign non-repeating scenes to cuts ensuring no consecutive clip file repetition
+    # 4.3 🧠 200% SMART SEMANTIC SCENE ASSIGNMENT ENGINE
+    # Maps every cut to what is spoken at that exact moment
     assigned_cuts = []
     last_file = None
     scene_cursor = 0
+    words_total = len(clean_words) if clean_words else 1
 
     for c in cuts:
-        attempts = 0
-        while attempts < len(unique_scenes):
-            candidate = unique_scenes[scene_cursor % len(unique_scenes)]
-            scene_cursor += 1
-            if candidate["file"] != last_file or len(all_clips) <= 1:
-                assigned_cuts.append((c, candidate))
-                last_file = candidate["file"]
-                break
-            attempts += 1
-        if attempts >= len(unique_scenes):
-            assigned_cuts.append((c, unique_scenes[scene_cursor % len(unique_scenes)]))
-            last_file = unique_scenes[scene_cursor % len(unique_scenes)]["file"]
-            scene_cursor += 1
+        # Determine words spoken in this specific cut window
+        w_start = int((c["start"] / total_dur) * words_total)
+        w_end = int((c["end"] / total_dur) * words_total) + 1
+        spoken_cut_words = " ".join(clean_words[w_start:w_end]) if clean_words else c["headline"]
+        category = get_cut_semantic_category(spoken_cut_words)
 
-    print(f"✓ Zero-Repeat Pacing Active: {len(assigned_cuts)} cuts mapped to non-repeating scenes with dynamic transforms.")
+        # Check if we have a bespoke procedural technical chart matching this spoken concept
+        candidate_file = None
+        if category in semantic_charts and semantic_charts[category]:
+            matching_charts = semantic_charts[category]
+            chosen_chart = matching_charts[c["idx"] % len(matching_charts)]
+            if chosen_chart != last_file:
+                candidate_file = chosen_chart
+
+        if candidate_file:
+            # High-relevance procedural technical chart match (200% Audio-Visual Lock)
+            assigned_cuts.append((c, {
+                "file": candidate_file,
+                "ss": 0.0,
+                "tf": "scale=1920:1080",
+                "is_hero": True,
+                "scene_id": f"semantic_{category}_{c['idx']}"
+            }))
+            last_file = candidate_file
+        else:
+            # Fallback to non-repeating B-roll clip ensuring zero consecutive repetition
+            attempts = 0
+            while attempts < len(unique_scenes):
+                candidate = unique_scenes[scene_cursor % len(unique_scenes)]
+                scene_cursor += 1
+                if candidate["file"] != last_file or len(all_clips) <= 1:
+                    assigned_cuts.append((c, candidate))
+                    last_file = candidate["file"]
+                    break
+                attempts += 1
+            if attempts >= len(unique_scenes):
+                assigned_cuts.append((c, unique_scenes[scene_cursor % len(unique_scenes)]))
+                last_file = unique_scenes[scene_cursor % len(unique_scenes)]["file"]
+                scene_cursor += 1
+
+    semantic_matches = sum(1 for _, sc in assigned_cuts if "semantic_" in sc.get("scene_id", ""))
+    print(f"✓ 200% Semantic Match Active: {len(assigned_cuts)} cuts assembled ({semantic_matches} exact audio-to-chart sync matches).")
 
     # Render segments with dynamic transforms & infinite stream loop safety
     print(f"✓ Rendering {len(cuts)} cuts with FFmpeg (Dynamic Ken Burns & Zero Scene Repetition)...")
