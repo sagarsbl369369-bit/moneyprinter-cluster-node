@@ -270,17 +270,31 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         page.click("#submitForm")
         time.sleep(3)
 
-        # 6. Step 2 Licensing & Rights
-        print("[CloudPublisher] 📜 Configuring Licensing & Rights...")
+        # 6. Step 2 Licensing & Rights (Exclusive Video Management for Max Ad Fill & Yahoo/MSN Syndication)
+        print("[CloudPublisher] 📜 Configuring Licensing & Rights (Exclusive Video Management: Value 1)...")
         try:
             page.wait_for_selector("input[name='license'], #crights, #cterms", timeout=45000)
-            page.click("input[name='license'][value='2'], div:has-text('Rumble Only')", timeout=8000)
+            # Prioritize Value 1 (Exclusive Video Management) for maximum ad fills across Rumble & global syndication
+            try:
+                page.click("input[name='license'][value='1'], div:has-text('Exclusive Video Management'), div:has-text('Video Management (excluding YouTube)')", timeout=5000)
+            except Exception:
+                page.click("input[name='license'][value='2'], div:has-text('Rumble Only')", timeout=4000)
         except Exception as e:
             print(f"[CloudPublisher] License select notice: {e}")
 
         page.evaluate("""() => {
-            const lic = document.querySelector("input[name='license'][value='2']");
-            if (lic) { lic.checked = true; lic.dispatchEvent(new Event('change', {bubbles: true})); }
+            // Select Value 1: Exclusive Video Management (Highest ad fills & earnings)
+            const lic1 = document.querySelector("input[name='license'][value='1']");
+            const lic2 = document.querySelector("input[name='license'][value='2']");
+            if (lic1) {
+                lic1.checked = true;
+                lic1.dispatchEvent(new Event('change', {bubbles: true}));
+                lic1.dispatchEvent(new Event('click', {bubbles: true}));
+            } else if (lic2) {
+                lic2.checked = true;
+                lic2.dispatchEvent(new Event('change', {bubbles: true}));
+                lic2.dispatchEvent(new Event('click', {bubbles: true}));
+            }
             const cr = document.getElementById('crights');
             if (cr && !cr.checked) { cr.checked = true; cr.dispatchEvent(new Event('change', {bubbles: true})); }
             const ct = document.getElementById('cterms');
