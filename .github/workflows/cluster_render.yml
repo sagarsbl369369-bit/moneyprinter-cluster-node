@@ -62,8 +62,10 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
         run: |
+          GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
+          echo "Executing Global Channel Job: #$GLOBAL_ID (Matrix: ${{ matrix.job_id }}, Start Index: ${{ inputs.start_index }})"
           python runner.py \
-            --job-id ${{ matrix.job_id }} \
+            --job-id $GLOBAL_ID \
             --batch-id "${{ inputs.batch_id }}" \
             --auto-publish-rumble
 
@@ -71,7 +73,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: live-ledger-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          name: live-ledger-node-${{ inputs.start_index }}-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
           path: output/rumble_live_ledger.json
           retention-days: 7
 
@@ -79,6 +81,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: video-16min-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          name: video-16min-node-${{ inputs.start_index }}-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
           path: output/*.mp4
           retention-days: 2
