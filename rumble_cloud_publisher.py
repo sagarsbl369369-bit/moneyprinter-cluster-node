@@ -206,20 +206,38 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         time.sleep(3)
 
         # 6. Step 2 Licensing & Rights
-        page.wait_for_selector("#submitForm2", timeout=60000)
-        page.click("input[name='license'][value='2'], div:has-text('Rumble Only')")
+        print("[CloudPublisher] 📜 Configuring Licensing & Rights...")
+        try:
+            page.wait_for_selector("input[name='license'], #crights, #cterms", timeout=45000)
+            page.click("input[name='license'][value='2'], div:has-text('Rumble Only')", timeout=8000)
+        except Exception as e:
+            print(f"[CloudPublisher] License select notice: {e}")
 
         page.evaluate("""() => {
+            const lic = document.querySelector("input[name='license'][value='2']");
+            if (lic) { lic.checked = true; lic.dispatchEvent(new Event('change', {bubbles: true})); }
             const cr = document.getElementById('crights');
             if (cr && !cr.checked) { cr.checked = true; cr.dispatchEvent(new Event('change', {bubbles: true})); }
             const ct = document.getElementById('cterms');
             if (ct && !ct.checked) { ct.checked = true; ct.dispatchEvent(new Event('change', {bubbles: true})); }
         }""")
-        time.sleep(1)
+        time.sleep(2)
 
         # 7. Final Publish
         print("[CloudPublisher] 🚀 Submitting final publish request (#submitForm2)...")
-        page.click("#submitForm2")
+        page.evaluate("""() => {
+            const btn = document.querySelector("#submitForm2");
+            if (btn) {
+                btn.scrollIntoView();
+                btn.removeAttribute('disabled');
+                btn.click();
+            }
+        }""")
+        time.sleep(3)
+        try:
+            page.click("#submitForm2", force=True, timeout=5000)
+        except Exception:
+            pass
         time.sleep(5)
 
         # 8. Extract Live URL
