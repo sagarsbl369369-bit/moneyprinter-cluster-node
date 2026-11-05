@@ -24,6 +24,14 @@ except ImportError:
         except ImportError:
             resolve_sector = None
 
+try:
+    from cluster.institutional_curriculum_100 import INSTITUTIONAL_TOPICS_100, get_unique_topic_for_job
+except ImportError:
+    try:
+        from institutional_curriculum_100 import INSTITUTIONAL_TOPICS_100, get_unique_topic_for_job
+    except ImportError:
+        get_unique_topic_for_job = None
+
 # 🎬 20 High-Retention Institutional Trading Topics (1 for each Matrix Runner)
 ENGLISH_TOPIC_REGISTRY = [
     {"title": "Why 99% Of Traders Fail: The Biological Conditioning Of Retail Slaughter", "voice": "en-US-ChristopherNeural", "channel": "SmartMoneyAlpha"},
@@ -93,12 +101,11 @@ def query_groq_api(prompt: str, system_prompt: str, key: str) -> str:
                 time.sleep(1.0)
     raise RuntimeError(f"All Groq models failed: {last_err}")
 
-def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
+def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_hook: str = "") -> str:
     """
-    Generates a true 15+ minute (2,300 - 2,500 words) deep institutional trading masterclass script.
-    Dynamically routes to one of 5 distinct Wall Street / CME sectors with unique personas,
-    10 sector-specific movements, and high-retention psychological CTAs.
-    Uses Dual-Key Groq load balancing (openai/gpt-oss-120b primary) with bespoke procedural fallbacks.
+    Generates an elite 5 to 6-minute (750 - 850 words) deep quantitative trading masterclass script.
+    Packs extreme market microstructure (Order Flow, CVD, ICT, 0DTE Options, Prop Firm Math)
+    and an explosive 0-30s hook designed for 75%+ completion retention.
     """
     # 1. Resolve Sector Curriculum
     if resolve_sector:
@@ -115,13 +122,6 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
                 ("Movement 3: Passive Limit Absorption vs Aggressive Market Orders", "CTA: Like if you've seen liquidity vanish."),
                 ("Movement 4: Level 2 Depth of Market Topography", ""),
                 ("Movement 5: Algorithmic Iceberg Slicing: Hidden Institutional Orders", "")
-            ],
-            "movements_p2": [
-                ("Movement 6: Cumulative Volume Delta Absorption & Aggressive Exhaustion", "Proof CTA: Subscribe for weekly order flow leaks."),
-                ("Movement 7: Dark Pool Cross-Trades: Hedge Fund Block Accumulation", ""),
-                ("Movement 8: Micro-Price Drift Mathematics & Imbalance Ratios", "Asset CTA: Comment your traded ticker."),
-                ("Movement 9: Volume Profile Architecture: Naked POCs & Value Areas", ""),
-                ("Movement 10: The Tape Reader's Execution Checklist", "Outro CTA: Like and subscribe to join the institutional elite.")
             ]
         }
 
@@ -149,9 +149,11 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
         # Build Fast Alpha 5-Movement Prompt (~800 words = 5.5 minutes)
         p1_lines = [
             f"Write an elite 5 to 6-minute Wall Street quantitative documentary masterclass on '{topic}'.",
-            f"Target Trading Sector: {sec_name}.",
-            "Structure strictly into these 5 movements, each with a full 160-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
+            f"Target Trading Sector: {sec_name}."
         ]
+        if specific_hook:
+            p1_lines.append(f"MANDATORY BESPOKE COLD OPEN HOOK (Use in Movement 1): '{specific_hook}'")
+        p1_lines.append("Structure strictly into these 5 movements, each with a full 160-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:")
         for title, cta in sec["movements_p1"]:
             p1_lines.append(f"=== {title} ===")
             if cta:
@@ -303,6 +305,88 @@ def load_verified_assets(assets_dir: Path):
     print(f"✓ Pure Assets Loaded: {len(hero_clips)} Hero clips, {len(bridge_clips)} Bridge clips.")
     return hero_clips, bridge_clips, bgm_path
 
+def generate_procedural_trading_chart(topic: str, out_path: Path, chart_index: int = 1):
+    """Generates an ultra-crisp 1920x1080 institutional technical candlestick chart slide."""
+    try:
+        from PIL import Image, ImageDraw
+    except ImportError:
+        import subprocess as sp
+        sp.run([sys.executable, "-m", "pip", "install", "Pillow"], check=True)
+        from PIL import Image, ImageDraw
+
+    w, h = 1920, 1080
+    bg_colors = [(11, 15, 23), (14, 18, 28), (8, 12, 20), (12, 16, 26)]
+    bg_col = bg_colors[chart_index % len(bg_colors)]
+    img = Image.new("RGB", (w, h), color=bg_col)
+    draw = ImageDraw.Draw(img)
+
+    # 1. Subtle Terminal Grid Lines
+    for x in range(0, w, 80):
+        draw.line([(x, 80), (x, h - 80)], fill=(22, 30, 46), width=1)
+    for y in range(80, h - 80, 60):
+        draw.line([(0, y), (w, y)], fill=(22, 30, 46), width=1)
+
+    # 2. Header HUD Bar
+    draw.rectangle([(0, 0), (w, 70)], fill=(16, 22, 35))
+    draw.line([(0, 70), (w, 70)], fill=(0, 215, 255), width=2)
+    draw.text((40, 22), "INSTITUTIONAL LIQUIDITY RADAR // TIER-1 MATCHING ENGINE", fill=(0, 215, 255))
+    draw.text((750, 22), f"ASSET: ES1! (E-MINI S&P) | 5M | {topic[:40].upper()}", fill=(200, 215, 235))
+    draw.text((1650, 22), "● LIVE CME GLOBEX", fill=(0, 255, 136))
+
+    # 3. Candlesticks (30 realistic candles with wicks)
+    candles = []
+    curr = 5850.0 + (chart_index * 15.0)
+    for i in range(26):
+        change = random.uniform(-9.0, 10.5)
+        o = curr
+        c = o + change
+        h_val = max(o, c) + random.uniform(1.5, 7.0)
+        l_val = min(o, c) - random.uniform(1.5, 7.0)
+        curr = c
+        candles.append((o, c, h_val, l_val))
+
+    start_x = 120
+    candle_w = 36
+    spacing = 60
+    all_prices = [p for c in candles for p in c]
+    min_p, max_p = min(all_prices) - 5, max(all_prices) + 5
+    p_range = max_p - min_p if max_p != min_p else 1.0
+
+    def py(price):
+        return int((h - 220) - ((price - min_p) / p_range) * (h - 380))
+
+    for idx, (o, c, high, low) in enumerate(candles):
+        cx = start_x + idx * spacing
+        is_green = c >= o
+        col = (0, 230, 118) if is_green else (255, 59, 48)
+        draw.line([(cx + candle_w // 2, py(high)), (cx + candle_w // 2, py(low))], fill=col, width=3)
+        top_y, bot_y = min(py(o), py(c)), max(py(o), py(c))
+        if bot_y == top_y: bot_y += 2
+        draw.rectangle([(cx, top_y), (cx + candle_w, bot_y)], fill=col)
+
+    # 4. Institutional Annotations
+    ob_idx = 10 + (chart_index % 8)
+    ob_x = start_x + ob_idx * spacing
+    ob_y1, ob_y2 = py(candles[ob_idx][2]) - 10, py(candles[ob_idx][3]) + 10
+    draw.rectangle([(ob_x - 10, ob_y1), (ob_x + 280, ob_y2)], outline=(0, 215, 255), width=2)
+    labels = [
+        "★ INSTITUTIONAL ORDER BLOCK (UNMITIGATED)",
+        "▲ FAIR VALUE GAP (FVG IMBALANCE ZONE)",
+        "◆ BALANCED PRICE RANGE (BPR RETEST)",
+        "▼ SELL-SIDE LIQUIDITY PURGE (STOP HUNT)",
+        "● CVD AGGRESSIVE ABSORPTION WALL"
+    ]
+    draw.text((ob_x, ob_y1 - 25), labels[chart_index % len(labels)], fill=(0, 215, 255))
+
+    # 5. Footer HUD
+    draw.rectangle([(0, h - 70), (w, h)], fill=(16, 22, 35))
+    draw.line([(0, h - 70), (w, h - 70)], fill=(0, 215, 255), width=2)
+    draw.text((40, h - 48), "RISK/REWARD: 1:3.8 | INVALIDATION: STRICT CANDLE CLOSE | TARGET: +45 HANDLES", fill=(0, 255, 136))
+    draw.text((1480, h - 48), "QUANTITATIVE RESEARCH // WALL STREET ALPHA", fill=(150, 170, 200))
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    img.save(str(out_path), quality=95)
+
 def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = ""):
     """Assembles 5 to 6-minute Fast Alpha Masterclass with Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
     print(f"\n[4/5] Executing Waveform Retention Video Assembly (5-6 Min Fast Alpha Mode)...")
@@ -310,6 +394,30 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
     segs_dir = temp_dir / "segments"
     segs_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # 4.2 Splicing Procedural Candlestick Technical Charts into Visual Pool (Eliminates Scene Repetition)
+    charts_dir = temp_dir / "charts"
+    charts_dir.mkdir(parents=True, exist_ok=True)
+    chart_clips = []
+    print("  → Splicing 4 bespoke institutional technical charts into hero visual pool...")
+    for c_i in range(1, 5):
+        try:
+            chart_img = charts_dir / f"chart_{c_i}.jpg"
+            generate_procedural_trading_chart(topic, chart_img, c_i)
+            chart_mp4 = segs_dir / f"procedural_chart_{c_i}.mp4"
+            subprocess.run([
+                "ffmpeg", "-y", "-loop", "1",
+                "-i", str(chart_img),
+                "-t", "3.2",
+                "-vf", "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0014,1.10)':d=96:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p",
+                "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22",
+                "-an", str(chart_mp4)
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            chart_clips.append(chart_mp4)
+        except Exception as ce:
+            print(f"  ! Procedural chart #{c_i} error: {ce}")
+    if chart_clips:
+        hero_clips = hero_clips + chart_clips
 
     # Audio duration
     probe_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(audio_path)]
@@ -561,21 +669,30 @@ def main():
     parser.add_argument("--auto-publish-rumble", action="store_true", help="Directly publish to Rumble from cloud")
     args = parser.parse_args()
 
-    topic_item = ENGLISH_TOPIC_REGISTRY[(args.job_id - 1) % len(ENGLISH_TOPIC_REGISTRY)]
-    channel = topic_item["channel"]
-
-    # Dynamically resolve sector curriculum, voice, and topic
-    sec = resolve_sector(args.job_id, channel) if resolve_sector else None
-    sec_name = sec["name"] if sec else "Quantitative Order Flow"
-    voice = sec["voice"] if sec else topic_item["voice"]
-    topic = topic_item["title"]
+    specific_hook = ""
+    if get_unique_topic_for_job:
+        topic_info = get_unique_topic_for_job(args.job_id)
+        topic = topic_info["title"]
+        voice = topic_info.get("voice", "en-US-ChristopherNeural")
+        specific_hook = topic_info.get("hook", "")
+        sec_name = topic_info.get("sector", "Institutional Microstructure")
+        channel = topic_info.get("channel", f"Channel_{args.job_id:03d}")
+    else:
+        topic_item = ENGLISH_TOPIC_REGISTRY[(args.job_id - 1) % len(ENGLISH_TOPIC_REGISTRY)]
+        channel = topic_item["channel"]
+        sec = resolve_sector(args.job_id, channel) if resolve_sector else None
+        sec_name = sec["name"] if sec else "Quantitative Order Flow"
+        voice = sec["voice"] if sec else topic_item["voice"]
+        topic = topic_item["title"]
 
     print("=" * 70)
-    print(f"🚀 DISTRIBUTED CLUSTER RUNNER (15+ MIN) | Job #{args.job_id} | Batch: {args.batch_id}")
+    print(f"🚀 FAST ALPHA CLUSTER RUNNER (5-6 MIN) | Job #{args.job_id} | Batch: {args.batch_id}")
     print(f"📺 Target Channel: {channel}")
     print(f"🏛️ Trading Sector: {sec_name}")
     print(f"🎙️ Voice Profile:  {voice}")
     print(f"🎯 Master Topic:   {topic}")
+    if specific_hook:
+        print(f"🪝 Bespoke Hook:   {specific_hook[:70]}...")
     print("=" * 70)
 
     # Stagger delay to prevent burst concurrency on Groq & TTS
@@ -583,8 +700,8 @@ def main():
     print(f"Applying stagger jitter: {jitter:.1f}s...")
     time.sleep(jitter)
 
-    # 1. 16-Minute Dual-Key Groq Script
-    script_content = generate_15min_script(topic, args.job_id, channel)
+    # 1. 5-6 Minute Fast Alpha Groq Script with Bespoke Hook
+    script_content = generate_15min_script(topic, args.job_id, channel, specific_hook=specific_hook)
 
     # 2. Studio Neural Speech
     raw_voice_path = Path(f"output/voice_job_{args.job_id}.mp3")
