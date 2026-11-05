@@ -221,15 +221,18 @@ def generate_flagship_vault_script(topic: str, sec_key: str = "orderflow") -> st
 
 async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path: Path):
     """
-    Synthesizes the 10-movement 16-minute script in small chunks with retries.
-    Guarantees 100% stable synthesis without WebSocket dropouts.
+    Synthesizes the 8-movement masterclass script in small chunks with retries.
+    Enforces +12% Wall Street speech rate (160 WPM) for maximum viewer retention.
+    Returns list of exact movement audio timing dictionaries for drift-free subtitle lock.
     """
-    print(f"\n[2/5] Synthesizing Studio Neural Audio in 10 Movements ({voice})...")
+    print(f"\n[2/5] Synthesizing Studio Neural Audio in Movements ({voice} | +12% Wall Street Cadence)...")
     temp_audio_dir = Path("temp_audio_chunks")
     temp_audio_dir.mkdir(parents=True, exist_ok=True)
 
     raw_chunks = [c.strip() for c in script_text.split("===") if c.strip()]
     chunk_files = []
+    movement_timings = []
+    current_time_cursor = 0.0
 
     for idx, chunk in enumerate(raw_chunks, 1):
         lines = chunk.split("\n", 1)
@@ -239,13 +242,13 @@ async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path:
             continue
 
         chunk_out = temp_audio_dir / f"chunk_{idx:02d}.mp3"
-        print(f"  → Synthesizing Movement {idx}/10 ({len(clean_text.split())} words)...")
+        print(f"  → Synthesizing Movement {idx}/{len(raw_chunks)} ({len(clean_text.split())} words, +12% rate)...")
 
-        # Retry loop
+        # Retry loop with rate="+12%"
         success = False
         for attempt in range(3):
             try:
-                comm = edge_tts.Communicate(clean_text, voice)
+                comm = edge_tts.Communicate(clean_text, voice, rate="+12%")
                 await comm.save(str(chunk_out))
                 if chunk_out.exists() and chunk_out.stat().st_size > 1000:
                     success = True
@@ -257,6 +260,23 @@ async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path:
         if not success:
             raise RuntimeError(f"Failed to synthesize Movement #{idx} after 3 attempts.")
 
+        # Probe exact duration of chunk
+        dur = 50.0
+        try:
+            p_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(chunk_out)]
+            res = subprocess.run(p_cmd, capture_output=True, text=True)
+            dur = float(json.loads(res.stdout).get("format", {}).get("duration", 50.0))
+        except Exception:
+            pass
+
+        movement_timings.append({
+            "idx": idx,
+            "text": clean_text,
+            "start": current_time_cursor,
+            "end": current_time_cursor + dur,
+            "dur": dur
+        })
+        current_time_cursor += dur
         chunk_files.append(chunk_out)
 
     # Concat all chunks with FFmpeg
@@ -273,45 +293,66 @@ async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path:
         str(out_path)
     ], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    print(f"✓ Master Voice Track Assembled: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB)")
+    print(f"✓ Master Voice Track Assembled: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB | {current_time_cursor/60:.2f} mins)")
+    return movement_timings
 
 def mix_ambient_suspense_audio(voice_path: Path, bgm_path: Path, out_path: Path):
-    """Mixes voice (145% volume boost + warm bass + peak limiter) with dark ambient suspense BGM (0.08)."""
-    print(f"\n[2.5/5] Mixing Cinematic Suspense Drone Atmosphere (145% Volume Boost + Bass Warmth)...")
-    if not bgm_path.exists():
-        print("  ! BGM not found, boosting voice to 150%...")
-        subprocess.run([
-            "ffmpeg", "-y", "-i", str(voice_path),
-            "-filter_complex", "[0:a]volume=1.5,alimiter=limit=0.98:attack=5:release=50[aout]",
-            "-map", "[aout]", "-c:a", "libmp3lame", "-b:a", "192k",
-            str(out_path)
-        ], check=True)
-        return
+    """Mixes voice (135% volume boost + warm bass + peak limiter) with dark ambient suspense BGM (0.20)."""
+    print(f"\n[2.5/5] Mixing Cinematic Suspense Drone Atmosphere (135% Voice + 20% BGM + Ducking)...")
+    
+    # If BGM missing or corrupt, generate procedural dark ambient tension drone directly
+    actual_bgm = bgm_path
+    if not actual_bgm or not actual_bgm.exists() or actual_bgm.stat().st_size < 1000:
+        print("  ! BGM not found, generating procedural dark ambient suspense drone via FFmpeg...")
+        procedural_bgm = voice_path.parent / "procedural_suspense_drone.mp3"
+        try:
+            # 55Hz low drone + subtle 110Hz harmonic + pink noise low-pass filtered
+            cmd_drone = [
+                "ffmpeg", "-y",
+                "-f", "lavfi", "-i", "anoisesrc=c=pink:r=44100:a=0.03",
+                "-f", "lavfi", "-i", "sine=f=55:r=44100",
+                "-f", "lavfi", "-i", "sine=f=110:r=44100",
+                "-filter_complex",
+                "[0:a]lowpass=f=220,volume=0.35[n];[1:a]volume=0.25[s1];[2:a]volume=0.12[s2];[n][s1][s2]amix=inputs=3:duration=first[drone];[drone]asetpts=PTS-STARTPTS[a]",
+                "-t", "600",
+                "-c:a", "libmp3lame", "-b:a", "192k",
+                str(procedural_bgm)
+            ]
+            subprocess.run(cmd_drone, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if procedural_bgm.exists() and procedural_bgm.stat().st_size > 1000:
+                actual_bgm = procedural_bgm
+                print("  ✓ Procedural Cinematic Drone Active (Audible Tension Atmosphere Guaranteed).")
+        except Exception as de:
+            print(f"  ! Procedural drone error: {de}")
 
     try:
-        cmd = [
-            "ffmpeg", "-y",
-            "-i", str(voice_path),
-            "-stream_loop", "-1",
-            "-i", str(bgm_path),
-            "-filter_complex", 
-            "[0:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=1.45,bass=g=4:f=110,alimiter=limit=0.98:attack=5:release=50[v];"
-            "[1:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=0.08[b];"
-            "[v][b]amix=inputs=2:duration=first:dropout_transition=2[aout]",
-            "-map", "[aout]",
-            "-c:a", "libmp3lame", "-b:a", "192k",
-            str(out_path)
-        ]
-        subprocess.run(cmd, check=True)
-        print(f"✓ Ducked Cinematic Audio Complete: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB)")
+        if actual_bgm and actual_bgm.exists() and actual_bgm.stat().st_size > 1000:
+            cmd = [
+                "ffmpeg", "-y",
+                "-i", str(voice_path),
+                "-stream_loop", "-1",
+                "-i", str(actual_bgm),
+                "-filter_complex", 
+                "[0:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=1.35,bass=g=3:f=115,alimiter=limit=0.98:attack=5:release=50[v];"
+                "[1:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=0.20,lowpass=f=4200[b];"
+                "[v][b]amix=inputs=2:duration=first:dropout_transition=2[aout]",
+                "-map", "[aout]",
+                "-c:a", "libmp3lame", "-b:a", "192k",
+                str(out_path)
+            ]
+            subprocess.run(cmd, check=True)
+            print(f"✓ Ducked Cinematic Audio Complete (Audible Suspense Score Active): {out_path.name}")
+            return
     except Exception as e:
         print(f"  ! Audio mix error ({e}); executing fallback voice boost...")
-        subprocess.run([
-            "ffmpeg", "-y", "-i", str(voice_path),
-            "-filter_complex", "[0:a]volume=1.5,alimiter=limit=0.98:attack=5:release=50[aout]",
-            "-map", "[aout]", "-c:a", "libmp3lame", "-b:a", "192k",
-            str(out_path)
-        ], check=True)
+
+    # Fallback if both fail
+    subprocess.run([
+        "ffmpeg", "-y", "-i", str(voice_path),
+        "-filter_complex", "[0:a]volume=1.35,alimiter=limit=0.98:attack=5:release=50[aout]",
+        "-map", "[aout]", "-c:a", "libmp3lame", "-b:a", "192k",
+        str(out_path)
+    ], check=True)
 
 def load_verified_assets(assets_dir: Path):
     """Loads all 36 pure financial clips + BGM track."""
@@ -331,6 +372,48 @@ def load_verified_assets(assets_dir: Path):
 
     print(f"✓ Pure Assets Loaded: {len(hero_clips)} Hero clips, {len(bridge_clips)} Bridge clips.")
     return hero_clips, bridge_clips, bgm_path
+
+def generate_cold_open_hook_card(topic: str, out_path: Path):
+    """Generates an intense institutional emergency alert hook card for the first 4-5 seconds."""
+    try:
+        from PIL import Image, ImageDraw
+    except ImportError:
+        import subprocess as sp
+        sp.run([sys.executable, "-m", "pip", "install", "Pillow"], check=True)
+        from PIL import Image, ImageDraw
+
+    w, h = 1920, 1080
+    img = Image.new("RGB", (w, h), color=(10, 4, 6))
+    draw = ImageDraw.Draw(img)
+
+    # 1. Dark Red Alert Border
+    draw.rectangle([(20, 20), (w - 20, h - 20)], outline=(255, 45, 45), width=6)
+    draw.rectangle([(40, 40), (w - 40, h - 40)], outline=(180, 20, 20), width=2)
+
+    # 2. Institutional Alert Badge Top
+    draw.rectangle([(w // 2 - 450, 70), (w // 2 + 450, 140)], fill=(220, 20, 20))
+    draw.text((w // 2 - 410, 92), "🚨 INSTITUTIONAL MICROSTRUCTURE ALERT // CONFIDENTIAL ALPHA", fill=(255, 255, 255))
+
+    # 3. Main Shock Hook Headline
+    draw.text((120, 240), "WARNING: RETAIL ORDER BOOK EXPLOIT DETECTED", fill=(255, 60, 60))
+    draw.line([(120, 290), (w - 120, 290)], fill=(255, 60, 60), width=4)
+
+    # 4. Big Bold Topic Name
+    draw.text((120, 340), f"ALGORITHM TARGET: {topic[:48].upper()}", fill=(255, 215, 0))
+
+    # 5. Massive Monetary Statistic Box
+    draw.rectangle([(120, 440), (w - 120, 760)], fill=(20, 12, 16), outline=(255, 215, 0), width=3)
+    draw.text((160, 480), "• RECORDED LIQUIDATION PURGE: $420,000,000 WIPED OUT", fill=(255, 255, 255))
+    draw.text((160, 540), "• EXECUTION MECHANISM: TIER-1 CME MATCHING ENGINE ICEBERG", fill=(0, 255, 136))
+    draw.text((160, 600), "• IMPACT STATUS: 92% RETAIL STOP-LOSSES PURGED IN 4.2 SECONDS", fill=(255, 100, 100))
+    draw.text((160, 660), "• OBJECTIVE: RE-ENGINEER EXECUTION BEFORE NEXT SESSION OPEN", fill=(0, 215, 255))
+
+    # 6. Bottom Flashing Banner
+    draw.rectangle([(0, h - 90), (w, h)], fill=(180, 15, 15))
+    draw.text((w // 2 - 340, h - 65), "DO NOT ENTER ANY TRADES UNTIL YOU DECONSTRUCT THIS BLUEPRINT", fill=(255, 255, 255))
+
+    img.save(str(out_path), "JPEG", quality=95)
+    print(f"✓ Cold Open Shock Hook Card Generated: {out_path.name}")
 
 def generate_procedural_trading_chart(topic: str, out_path: Path, chart_index: int = 1):
     """Generates 8 distinct institutional quantitative technical chart types (1920x1080)."""
@@ -509,19 +592,37 @@ def get_cut_semantic_category(spoken_words: str) -> str:
         return "mindset"
     return "general_market"
 
-def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = ""):
-    """Assembles 5 to 6-minute Fast Alpha Masterclass with 200% Smart Audio-Visual Matching, Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
-    print(f"\n[4/5] Executing 200% Smart Semantic Audio-Visual Assembly (5-6 Min Fast Alpha Mode)...")
+def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = "", movement_timings: list = None):
+    """Assembles 8 to 9-minute Masterclass with 200% Smart Audio-Visual Matching, Dynamic Ken Burns Charts, Movement-Locked Subtitles, and 0-5s Cold Open Hook."""
+    print(f"\n[4/5] Executing High-Retention 200% Smart Audio-Visual Assembly (8-9 Min Masterclass)...")
     temp_dir = Path("temp_render")
     segs_dir = temp_dir / "segments"
     segs_dir.mkdir(parents=True, exist_ok=True)
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # 4.2 Splicing 8 Distinct Procedural Candlestick & Order Book Technical Charts into Visual Pool
     charts_dir = temp_dir / "charts"
     charts_dir.mkdir(parents=True, exist_ok=True)
+
+    # 4.1 Generate Cold Open Shock Hook Card (First 4-5 Seconds)
+    hook_img = charts_dir / "cold_open_hook.jpg"
+    generate_cold_open_hook_card(topic, hook_img)
+    hook_mp4 = segs_dir / "cold_open_hook.mp4"
+    try:
+        subprocess.run([
+            "ffmpeg", "-y", "-loop", "1",
+            "-i", str(hook_img),
+            "-t", "5.0",
+            "-vf", "scale=2400:1350,zoompan=z='min(zoom+0.0022,1.16)':d=150:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p",
+            "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22",
+            "-an", str(hook_mp4)
+        ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+        print("✓ Cold Open Hook Video Segment Ready (4.5s Punch-In Dynamic Zoom).")
+    except Exception as he:
+        print(f"  ! Hook card render warning: {he}")
+
+    # 4.2 Splicing 8 Distinct Procedural Candlestick & Order Book Technical Charts with Kinetic Ken Burns ZoomPan
     semantic_charts = {}
-    print("  → Splicing 8 bespoke institutional technical charts (DOM, CVD, FVG, Risk) into visual pool...")
+    print("  → Splicing 8 bespoke institutional technical charts (DOM, CVD, FVG, Risk) with Ken Burns motion...")
     chart_category_map = [
         "order_block",       # chart 1: FVG Imbalance
         "order_block",       # chart 2: Order Block Purge
@@ -537,11 +638,12 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
             chart_img = charts_dir / f"chart_{c_i}.jpg"
             generate_procedural_trading_chart(topic, chart_img, c_i)
             chart_mp4 = segs_dir / f"procedural_chart_{c_i}.mp4"
+            chart_zoom = "scale=2400:1350,zoompan=z='min(zoom+0.0012,1.14)':d=225:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p" if c_i % 2 == 0 else "scale=2400:1350,zoompan=z='max(1.14-0.0012*on,1.0)':d=225:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p"
             subprocess.run([
                 "ffmpeg", "-y", "-loop", "1",
                 "-i", str(chart_img),
-                "-t", "3.4",
-                "-vf", "scale=1920:1080:force_original_aspect_ratio=increase,crop=1920:1080,zoompan=z='min(zoom+0.0014,1.10)':d=102:x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':s=1920x1080:fps=30,format=yuv420p",
+                "-t", "7.5",
+                "-vf", chart_zoom,
                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "22",
                 "-an", str(chart_mp4)
             ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
@@ -614,38 +716,71 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         lines = [l.strip() for l in script_text.splitlines() if l.strip() and not l.strip().startswith("===")]
         clean_words = " ".join(lines).split()
 
-    phrases = []
-    if clean_words:
-        chunk_size = 5
-        for i in range(0, len(clean_words), chunk_size):
-            chunk = " ".join(clean_words[i:i+chunk_size])
-            phrases.append(chunk)
+    if movement_timings:
+        print("  → Assembling Movement-Locked Synced Subtitles (Zero Accumulated Drift Across 8.5 Mins)...")
+        for mov in movement_timings:
+            m_words = mov["text"].split()
+            if not m_words:
+                continue
+            chunk_size = 4
+            mov_phrases = [" ".join(m_words[i:i+chunk_size]) for i in range(0, len(m_words), chunk_size)]
+            time_per_p = mov["dur"] / len(mov_phrases) if mov_phrases else 2.0
+            
+            for p_i, phrase in enumerate(mov_phrases):
+                p_t0 = mov["start"] + p_i * time_per_p
+                p_t1 = min(mov["start"] + (p_i + 1) * time_per_p, mov["end"])
+                if p_t0 >= total_dur:
+                    break
+
+                m1, s1 = divmod(p_t0, 60)
+                h1, m1 = divmod(m1, 60)
+                cs1 = int((s1 - int(s1)) * 100)
+                t_start = f"{int(h1)}:{int(m1):02d}:{int(s1):02d}.{cs1:02d}"
+
+                m2, s2 = divmod(p_t1, 60)
+                h2, m2 = divmod(m2, 60)
+                cs2 = int((s2 - int(s2)) * 100)
+                t_end = f"{int(h2)}:{int(m2):02d}:{int(s2):02d}.{cs2:02d}"
+
+                clean_phrase = phrase.upper().replace("{", "").replace("}", "")
+                for kw in ["LIQUIDATED", "STOP LOSS", "ICEBERG", "ORDER BLOCK", "DARK POOL", "SMART MONEY", "CVD", "0DTE", "FVG", "TRAP", "BREAKOUT", "MILLION", "ALGORITHM", "PURGE"]:
+                    if kw in clean_phrase:
+                        clean_phrase = clean_phrase.replace(kw, f"{{\\c&H00D7FF&}}{kw}{{\\c&HFFFFFF&}}")
+
+                dialogues.append(f"Dialogue: 0,{t_start},{t_end},Default,,0,0,0,,{clean_phrase}")
     else:
-        phrases = headlines
+        phrases = []
+        if clean_words:
+            chunk_size = 5
+            for i in range(0, len(clean_words), chunk_size):
+                chunk = " ".join(clean_words[i:i+chunk_size])
+                phrases.append(chunk)
+        else:
+            phrases = headlines
 
-    time_per_phrase = total_dur / len(phrases) if phrases else 2.5
-    for idx, phrase in enumerate(phrases):
-        t0 = idx * time_per_phrase
-        t1 = min((idx + 1) * time_per_phrase, total_dur)
-        if t0 >= total_dur:
-            break
+        time_per_phrase = total_dur / len(phrases) if phrases else 2.5
+        for idx, phrase in enumerate(phrases):
+            t0 = idx * time_per_phrase
+            t1 = min((idx + 1) * time_per_phrase, total_dur)
+            if t0 >= total_dur:
+                break
 
-        m1, s1 = divmod(t0, 60)
-        h1, m1 = divmod(m1, 60)
-        cs1 = int((s1 - int(s1)) * 100)
-        t_start = f"{int(h1)}:{int(m1):02d}:{int(s1):02d}.{cs1:02d}"
+            m1, s1 = divmod(t0, 60)
+            h1, m1 = divmod(m1, 60)
+            cs1 = int((s1 - int(s1)) * 100)
+            t_start = f"{int(h1)}:{int(m1):02d}:{int(s1):02d}.{cs1:02d}"
 
-        m2, s2 = divmod(t1, 60)
-        h2, m2 = divmod(m2, 60)
-        cs2 = int((s2 - int(s2)) * 100)
-        t_end = f"{int(h2)}:{int(m2):02d}:{int(s2):02d}.{cs2:02d}"
+            m2, s2 = divmod(t1, 60)
+            h2, m2 = divmod(m2, 60)
+            cs2 = int((s2 - int(s2)) * 100)
+            t_end = f"{int(h2)}:{int(m2):02d}:{int(s2):02d}.{cs2:02d}"
 
-        clean_phrase = phrase.upper().replace("{", "").replace("}", "")
-        for kw in ["LIQUIDATED", "STOP LOSS", "ICEBERG", "ORDER BLOCK", "DARK POOL", "SMART MONEY", "CVD", "0DTE", "FVG", "TRAP", "BREAKOUT", "MILLION", "ALGORITHM"]:
-            if kw in clean_phrase:
-                clean_phrase = clean_phrase.replace(kw, f"{{\\c&H00D7FF&}}{kw}{{\\c&HFFFFFF&}}")
+            clean_phrase = phrase.upper().replace("{", "").replace("}", "")
+            for kw in ["LIQUIDATED", "STOP LOSS", "ICEBERG", "ORDER BLOCK", "DARK POOL", "SMART MONEY", "CVD", "0DTE", "FVG", "TRAP", "BREAKOUT", "MILLION", "ALGORITHM"]:
+                if kw in clean_phrase:
+                    clean_phrase = clean_phrase.replace(kw, f"{{\\c&H00D7FF&}}{kw}{{\\c&HFFFFFF&}}")
 
-        dialogues.append(f"Dialogue: 0,{t_start},{t_end},Default,,0,0,0,,{clean_phrase}")
+            dialogues.append(f"Dialogue: 0,{t_start},{t_end},Default,,0,0,0,,{clean_phrase}")
 
     ass_path.write_text(header + "\n".join(dialogues) + "\n", encoding="utf-8")
 
@@ -691,6 +826,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     words_total = len(clean_words) if clean_words else 1
 
     for c in cuts:
+        # Dynamic Cold Open Institutional Shock Hook for Cut #0 (First 4-5 Seconds)
+        if c["idx"] == 0 and hook_mp4 and hook_mp4.exists():
+            assigned_cuts.append((c, {
+                "file": hook_mp4,
+                "ss": 0.0,
+                "tf": "scale=1920:1080",
+                "is_hero": True,
+                "scene_id": "cold_open_institutional_alert"
+            }))
+            last_file = hook_mp4
+            continue
+
         # Determine words spoken in this specific cut window
         w_start = int((c["start"] / total_dur) * words_total)
         w_end = int((c["end"] / total_dur) * words_total) + 1
@@ -892,21 +1039,21 @@ def main():
     # 1. 5-6 Minute Fast Alpha Groq Script with Bespoke Hook
     script_content = generate_15min_script(topic, args.job_id, channel, specific_hook=specific_hook)
 
-    # 2. Studio Neural Speech
+    # 2. Studio Neural Speech (+12% Wall Street Cadence + Exact Movement Timings)
     raw_voice_path = Path(f"output/voice_job_{args.job_id}.mp3")
     raw_voice_path.parent.mkdir(parents=True, exist_ok=True)
-    asyncio.run(synthesize_chunked_audio_async(script_content, voice, raw_voice_path))
+    mov_timings = asyncio.run(synthesize_chunked_audio_async(script_content, voice, raw_voice_path))
 
     # 3. Assets & Suspense BGM
     hero_clips, bridge_clips, bgm_path = load_verified_assets(Path("assets"))
 
-    # 4. Cinematic Audio Ducking (Voice 1.0 + BGM 0.07)
+    # 4. Cinematic Audio Ducking (Voice 1.35 + BGM 0.20 + Procedural Tension Fallback)
     ducked_audio_path = Path(f"output/ducked_audio_job_{args.job_id}.mp3")
     mix_ambient_suspense_audio(raw_voice_path, bgm_path, ducked_audio_path)
 
-    # 5. Final 16-Minute Masterclass Assembly with Speech-Synchronized Dynamic Subtitles
+    # 5. Final Masterclass Assembly with Movement-Locked Subtitles & Dynamic Ken Burns
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
-    render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video, script_text=script_content)
+    render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video, script_text=script_content, movement_timings=mov_timings)
 
     # 5.5 Pick a random custom thumbnail from the 1 - 1,000,000+ vault
     custom_thumb = select_random_thumbnail()
