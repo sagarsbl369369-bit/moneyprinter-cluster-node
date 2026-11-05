@@ -1,4 +1,4 @@
-name: Cluster Masterclass Generation (20 Concurrent Runners - 15+ Min)
+name: Cluster Masterclass Generation & Direct Cloud Ingest (20 Concurrent Runners)
 
 on:
   workflow_dispatch:
@@ -6,11 +6,15 @@ on:
       batch_id:
         description: 'Batch Identifier'
         required: true
-        default: 'batch_15min_001'
+        default: 'batch_cloud_direct_001'
       start_index:
         description: 'Global Video Start Index'
         required: true
         default: '1'
+      auto_publish:
+        description: 'Publish directly to Rumble from Cloud'
+        required: true
+        default: 'true'
 
 jobs:
   generate_masterclass:
@@ -32,15 +36,19 @@ jobs:
           python-version: '3.10'
           cache: 'pip'
 
-      - name: Install System Dependencies (FFmpeg)
+      - name: Install System Dependencies (FFmpeg & Libs)
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y -qq ffmpeg
+          sudo apt-get install -y -qq ffmpeg libnss3 libnspr4 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 libasound2
 
       - name: Install Python Dependencies
         run: |
           pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Install Playwright Chromium for Direct Cloud Upload
+        run: |
+          python -m playwright install --with-deps chromium
 
       - name: Download Verified Pure Financial Assets & BGM (v2.0.0)
         run: |
@@ -48,15 +56,29 @@ jobs:
           unzip -q assets.zip -d assets/
           ls -la assets/
 
-      - name: Execute Autonomous 15+ Min Video Generation
+      - name: Execute Autonomous Masterclass Generation & Direct Cloud Ingest
+        env:
+          RUMBLE_SESSION_B64: ${{ secrets.RUMBLE_SESSION_B64 }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
         run: |
           python runner.py \
             --job-id ${{ matrix.job_id }} \
-            --batch-id "${{ inputs.batch_id }}"
+            --batch-id "${{ inputs.batch_id }}" \
+            --auto-publish-rumble
+
+      - name: Upload Rumble Live Ledger Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-ledger-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          path: output/rumble_live_ledger.json
+          retention-days: 7
 
       - name: Upload Masterclass Video Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: video-16min-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
           path: output/*.mp4
-          retention-days: 3
+          retention-days: 2
