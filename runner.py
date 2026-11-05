@@ -262,8 +262,8 @@ async def synthesize_chunked_audio_async(script_text: str, voice: str, out_path:
     print(f"✓ Master Voice Track Assembled: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
 def mix_ambient_suspense_audio(voice_path: Path, bgm_path: Path, out_path: Path):
-    """Mixes voice (150% volume boost + peak limiter) with continuous ducked dark ambient suspense BGM (0.07)."""
-    print(f"\n[2.5/5] Mixing Cinematic Suspense Drone Atmosphere (150% Volume Boost)...")
+    """Mixes voice (145% volume boost + warm bass + peak limiter) with dark ambient suspense BGM (0.08)."""
+    print(f"\n[2.5/5] Mixing Cinematic Suspense Drone Atmosphere (145% Volume Boost + Bass Warmth)...")
     if not bgm_path.exists():
         print("  ! BGM not found, boosting voice to 150%...")
         subprocess.run([
@@ -274,23 +274,30 @@ def mix_ambient_suspense_audio(voice_path: Path, bgm_path: Path, out_path: Path)
         ], check=True)
         return
 
-    # Breathing sidechain ducking: BGM at 10% volume ducks smoothly when voice speaks, swells up during dramatic pauses
-    cmd = [
-        "ffmpeg", "-y",
-        "-i", str(voice_path),
-        "-stream_loop", "-1",
-        "-i", str(bgm_path),
-        "-filter_complex", 
-        "[0:a]volume=1.45,bass=g=5:f=110,alimiter=limit=0.98:attack=5:release=50[v];"
-        "[1:a]volume=0.10[b];"
-        "[b][v]sidechaincompress=threshold=0.07:ratio=6:attack=20:release=350[ducked_bgm];"
-        "[v][ducked_bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]",
-        "-map", "[aout]",
-        "-c:a", "libmp3lame", "-b:a", "192k",
-        str(out_path)
-    ]
-    subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    print(f"✓ Ducked Cinematic Audio Complete: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB) [150% Boost]")
+    try:
+        cmd = [
+            "ffmpeg", "-y",
+            "-i", str(voice_path),
+            "-stream_loop", "-1",
+            "-i", str(bgm_path),
+            "-filter_complex", 
+            "[0:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=1.45,bass=g=4:f=110,alimiter=limit=0.98:attack=5:release=50[v];"
+            "[1:a]aformat=channel_layouts=stereo:sample_rates=44100,volume=0.08[b];"
+            "[v][b]amix=inputs=2:duration=first:dropout_transition=2[aout]",
+            "-map", "[aout]",
+            "-c:a", "libmp3lame", "-b:a", "192k",
+            str(out_path)
+        ]
+        subprocess.run(cmd, check=True)
+        print(f"✓ Ducked Cinematic Audio Complete: {out_path.name} ({out_path.stat().st_size / 1e6:.1f} MB)")
+    except Exception as e:
+        print(f"  ! Audio mix error ({e}); executing fallback voice boost...")
+        subprocess.run([
+            "ffmpeg", "-y", "-i", str(voice_path),
+            "-filter_complex", "[0:a]volume=1.5,alimiter=limit=0.98:attack=5:release=50[aout]",
+            "-map", "[aout]", "-c:a", "libmp3lame", "-b:a", "192k",
+            str(out_path)
+        ], check=True)
 
 def load_verified_assets(assets_dir: Path):
     """Loads all 36 pure financial clips + BGM track."""
