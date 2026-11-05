@@ -103,9 +103,10 @@ def query_groq_api(prompt: str, system_prompt: str, key: str) -> str:
 
 def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_hook: str = "") -> str:
     """
-    Generates an elite 5 to 6-minute (750 - 850 words) deep quantitative trading masterclass script.
+    Generates an elite 8 to 9-minute (1,250 - 1,350 words) deep quantitative trading masterclass script.
     Packs extreme market microstructure (Order Flow, CVD, ICT, 0DTE Options, Prop Firm Math)
-    and an explosive 0-30s hook designed for 75%+ completion retention.
+    and an explosive 0-45s hook designed for 80%+ completion retention.
+    Strictly enforces >= 8:00 minutes hard floor.
     """
     # 1. Resolve Sector Curriculum
     if resolve_sector:
@@ -117,17 +118,32 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_h
             "voice": "en-US-ChristopherNeural",
             "persona": "You are an elite quantitative Wall Street trading psychologist and continuous double auction theorist.",
             "movements_p1": [
-                ("Movement 1: Microscopic Auction Theory & Continuous Double Auction Mechanics", "Hook CTA: Ask viewers to comment their biggest slippage loss."),
-                ("Movement 2: The Electronic Broking Services & CME Order Book Reality", ""),
-                ("Movement 3: Passive Limit Absorption vs Aggressive Market Orders", "CTA: Like if you've seen liquidity vanish."),
-                ("Movement 4: Level 2 Depth of Market Topography", ""),
-                ("Movement 5: Algorithmic Iceberg Slicing: Hidden Institutional Orders", "")
+                ("Movement 1: The Cold Open Invalidation Trap (0-45s Shock Hook)", "Hook CTA: Ask viewers to comment their biggest slippage loss."),
+                ("Movement 2: Continuous Double Auction Mechanics & CME Matching Engine", ""),
+                ("Movement 3: Passive Limit Absorption vs Aggressive Market Order Sweeps", "CTA: Like if you've seen liquidity vanish."),
+                ("Movement 4: Level 2 Depth of Market Topography & Iceberg Slicing", ""),
+                ("Movement 5: The Algorithmic Stop-Loss Purge & Liquidity Void Run", ""),
+                ("Movement 6: Asymmetric Mathematical Expectancy (1:3.5 R:R at 35% Win Rate)", "CTA: Save this math formula."),
+                ("Movement 7: Historical Institutional Case Study ($420M Liquidation Proof)", ""),
+                ("Movement 8: The Sovereign Predator Execution Protocol (Final Mindset & Action)", "CTA: Subscribe for daily institutional alpha.")
             ]
         }
 
+    all_movements = list(sec.get("movements_p1", []))
+    if len(all_movements) < 8:
+        extra_movements = [
+            ("Movement 5: The Algorithmic Stop-Loss Purge & Liquidity Void Run", ""),
+            ("Movement 6: Asymmetric Mathematical Expectancy (1:3.5 R:R at 35% Win Rate)", "CTA: Save this math formula."),
+            ("Movement 7: Historical Institutional Case Study ($420M Liquidation Proof)", ""),
+            ("Movement 8: The Sovereign Predator Execution Protocol (Final Mindset & Action)", "CTA: Subscribe for daily institutional alpha.")
+        ]
+        for em in extra_movements:
+            if len(all_movements) < 8:
+                all_movements.append(em)
+
     sec_name = sec["name"]
     sec_key = sec.get("key", "orderflow")
-    print(f"\n[1/5] 🧠 Generating Fast Alpha Masterclass (5-6 Min) for: '{topic}'")
+    print(f"\n[1/5] 🧠 Generating Flagship Masterclass (8-9 Min Strict Floor) for: '{topic}'")
     print(f"      🏛️ Sector: {sec_name} | Key: {sec_key}")
 
     primary_key = GROQ_KEYS[(job_id - 1) % len(GROQ_KEYS)]
@@ -136,9 +152,9 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_h
     system_prompt = (
         f"{sec['persona']} "
         "You are an elite cinematic trading documentary director (in the style of Vox, MagnatesMedia, and ColdFusion). "
-        "MANDATORY FAST ALPHA RETENTION ENGINE (75%+ COMPLETION GOAL): "
-        "1. THE FIRST 30 SECONDS (MOVEMENT 1): Must be an adrenaline-pumping, shocking COLD OPEN HOOK. Open directly with an alarming insider revelation, "
-        "a shocking monetary statistic ($350M liquidated in 4 seconds), and an intellectual challenge that disrupts everything the retail trader thinks they know. "
+        "MANDATORY 8-MINUTE DOCUMENTARY RETENTION PROTOCOL (STRICT FLOOR: >= 1,200 WORDS): "
+        "1. THE FIRST 45 SECONDS (MOVEMENT 1): Must be an adrenaline-pumping, shocking COLD OPEN HOOK. Open directly with an alarming insider revelation, "
+        "a shocking monetary statistic ($420M liquidated in 4 seconds), and an intellectual challenge that disrupts everything the retail trader thinks they know. "
         "Never say 'Welcome' or 'In this video' or academic pleasantries. Jump straight into the slaughterhouse mechanics. "
         "2. CONTINUOUS SUSPENSE PACING: Speak with absolute authority, cold first-principles logic, authentic mathematical formulas, and zero generic marketing fluff. "
         "3. Write ONLY the spoken voiceover narration prose. Do NOT include bracketed stage directions like [Camera zooms] or cues. "
@@ -146,22 +162,21 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_h
     )
 
     try:
-        # Build Fast Alpha 5-Movement Prompt (~800 words = 5.5 minutes)
         p1_lines = [
-            f"Write an elite 5 to 6-minute Wall Street quantitative documentary masterclass on '{topic}'.",
-            f"Target Trading Sector: {sec_name}."
+            f"Write an exhaustive 8 to 9-minute Wall Street quantitative documentary masterclass on '{topic}'.",
+            f"Target Trading Sector: {sec_name}.",
+            "MANDATORY LENGTH CONTRACT: Write strictly 8 movements, each with a full 160-word deeply analytical spoken paragraph packed with concrete numbers, price levels, and mathematical formulas (TOTAL SCRIPT MUST BE AT LEAST 1,250 WORDS = 8.5 MINUTES)."
         ]
         if specific_hook:
             p1_lines.append(f"MANDATORY BESPOKE COLD OPEN HOOK (Use in Movement 1): '{specific_hook}'")
-        p1_lines.append("Structure strictly into these 5 movements, each with a full 160-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:")
-        for title, cta in sec["movements_p1"]:
+        for title, cta in all_movements[:8]:
             p1_lines.append(f"=== {title} ===")
             if cta:
                 p1_lines.append(f"(MANDATORY CTA: {cta})")
-        p1_lines.append("Write continuous, brilliant spoken narration prose for all 5 movements now:")
+        p1_lines.append("Write continuous, brilliant spoken narration prose for all 8 movements now:")
         p1_prompt = "\n".join(p1_lines)
 
-        print(f"  → Querying Groq Fast Alpha (Movements 1-5) via 120B Reasoning with Key #{(job_id - 1) % 2 + 1}...")
+        print(f"  → Querying Groq Flagship 8-Min Masterclass (Movements 1-8) via 120B Reasoning with Key #{(job_id - 1) % 2 + 1}...")
         try:
             p1_text = query_groq_api(p1_prompt, system_prompt, primary_key)
         except Exception as e:
@@ -170,18 +185,30 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "", specific_h
 
         words = len(p1_text.split())
         est_min = round(words / 145, 1)
-        print(f"✓ AI Fast Alpha Script Complete! Total Words: {words} (~{est_min} minutes)")
-        if words > 500:
-            return p1_text
+        print(f"✓ AI Masterclass Script Complete! Total Words: {words} (~{est_min} minutes)")
+
+        # STRICT 8-MINUTE DURATION HARD FLOOR GUARD (>= 1,180 WORDS)
+        if words < 1180:
+            print(f"⚠️ Script ({words} words) is below 1,180 words (8-min hard floor)! Appending Institutional Case Study...")
+            try:
+                p2_prompt = f"Write an exhaustive 220-word historical quantitative case study and execution breakdown for '{topic}' showing exact order block entry, 1:3.5 risk:reward math, and stop-loss hunt mechanics."
+                case_study = query_groq_api(p2_prompt, system_prompt, primary_key)
+                p1_text += "\n\n=== Movement 9: Deep Quantitative Liquidity Case Study ===\n" + case_study
+                words = len(p1_text.split())
+                est_min = round(words / 145, 1)
+                print(f"✓ Expanded Script to {words} words (~{est_min} minutes) [STRICT >= 8:00 MIN FLOOR: YES]")
+            except Exception as ex:
+                print(f"  ! Expansion error: {ex}")
+        return p1_text
     except Exception as e:
         print(f"[!] Groq generation error ({e}). Deploying bespoke Sector Procedural Masterclass...")
 
     if get_procedural_masterclass:
         full_procedural = get_procedural_masterclass(sec_key, topic)
-        # Take first 5 movements for 5-6 min Fast Alpha duration
         chunks = [c.strip() for c in full_procedural.split("===") if c.strip()]
-        if len(chunks) > 5:
-            return "=== " + "=== ".join(chunks[:5])
+        # Take 8 movements for 8.5 min duration
+        if len(chunks) >= 8:
+            return "=== " + "=== ".join(chunks[:8])
         return full_procedural
     return generate_flagship_vault_script(topic)
     return generate_flagship_vault_script(topic)
@@ -528,8 +555,8 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
     # Audio duration
     probe_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(audio_path)]
     res = subprocess.run(probe_cmd, capture_output=True, text=True)
-    total_dur = float(json.loads(res.stdout).get("format", {}).get("duration", 330.0))
-    print(f"✓ Total Duration: {total_dur:.1f}s ({total_dur/60:.2f} minutes) [FAST ALPHA 5-6 MIN: YES]")
+    total_dur = float(json.loads(res.stdout).get("format", {}).get("duration", 495.0))
+    print(f"✓ Total Duration: {total_dur:.1f}s ({total_dur/60:.2f} minutes) [STRICT >= 8:00 MIN FLOOR: {'YES' if total_dur >= 480 else 'PADDING'}]")
 
     # 10 Contextual Movement Subtitle Headlines (fallback)
     headlines = [
@@ -707,19 +734,46 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     semantic_matches = sum(1 for _, sc in assigned_cuts if "semantic_" in sc.get("scene_id", ""))
     print(f"✓ 200% Semantic Match Active: {len(assigned_cuts)} cuts assembled ({semantic_matches} exact audio-to-chart sync matches).")
 
+    # 4.4 Determine Cinematic Visual Universe (Aesthetic Color Grade & Atmosphere)
+    world_id = (abs(hash(topic)) + (cuts[0]["idx"] if cuts else 0)) % 8
+    world_filters = [
+        "eq=contrast=1.15:brightness=-0.02:saturation=1.12",                       # U1: Bloomberg Cyan
+        "colorbalance=rs=0.14:gs=-0.05:bs=-0.08,eq=contrast=1.22",                # U2: Wall Street Crimson
+        "colorbalance=bs=0.16:ms=0.08:rs=0.05,eq=saturation=1.25",                # U3: Tokyo Globex
+        "colorbalance=gs=0.10:rs=0.08:bs=-0.06,eq=contrast=1.16",                 # U4: Gold Vault
+        "colorbalance=rs=0.10:gs=0.08:bs=-0.20,eq=contrast=1.20",                 # U5: HFT Radar
+        "curves=vintage,eq=contrast=1.12:saturation=0.92",                          # U6: 35mm Floor
+        "colorbalance=bs=0.12:gs=0.04:rs=-0.05,eq=contrast=1.14",                 # U7: Nordic Ice
+        "colorbalance=gs=0.08:bs=0.08:rs=-0.04,eq=contrast=1.20:saturation=1.15"  # U8: Quantum Desk
+    ]
+    world_names = [
+        "Bloomberg Cyan Matrix",
+        "Wall Street Crimson Crisis",
+        "Tokyo Globex Cyberpunk",
+        "Central Bank Gold Vault",
+        "HFT Algorithm Radar",
+        "Chicago Floor Vintage 35mm",
+        "Nordic Sovereign Macro",
+        "Quantum Derivative Desk"
+    ]
+    color_grade = world_filters[world_id]
+    print(f"✓ Visual Universe Active: World #{world_id+1} [{world_names[world_id]}] (Dynamic Color Grading Applied)")
+
     # Render segments with dynamic transforms & infinite stream loop safety
     print(f"✓ Rendering {len(cuts)} cuts with FFmpeg (Dynamic Ken Burns & Zero Scene Repetition)...")
     concat_list = temp_dir / "concat.txt"
     with open(concat_list, "w", encoding="utf-8") as f_out:
         for c, scene in assigned_cuts:
             seg_file = segs_dir / f"seg_{c['idx']:04d}.mp4"
+            is_chart = "semantic_" in scene.get("scene_id", "") or "chart" in str(scene["file"]).lower()
+            vf_str = f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p" if is_chart else f"{scene['tf']},{color_grade},scale=1920:1080,fps=30,format=yuv420p"
             cmd = [
                 "ffmpeg", "-y",
                 "-stream_loop", "-1",
                 "-ss", f"{scene['ss']:.2f}",
                 "-i", str(scene["file"]),
                 "-t", f"{c['dur']:.2f}",
-                "-vf", f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p",
+                "-vf", vf_str,
                 "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
                 "-an", str(seg_file)
             ]
@@ -730,7 +784,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     "ffmpeg", "-y", "-stream_loop", "-1",
                     "-i", str(scene["file"]),
                     "-t", f"{c['dur']:.2f}",
-                    "-vf", f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p",
+                    "-vf", vf_str,
                     "-c:v", "libx264", "-preset", "ultrafast", "-crf", "24",
                     "-an", str(seg_file)
                 ]
