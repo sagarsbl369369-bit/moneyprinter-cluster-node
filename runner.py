@@ -134,10 +134,14 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
 
     system_prompt = (
         f"{sec['persona']} "
-        "You write deeply analytical, intellectually devastating trading documentary masterclasses that expose the mechanical illusion "
-        "of retail trading. Speak with absolute authority, cold first-principles logic, authentic mathematical formulas, and zero generic marketing fluff. "
-        "Write ONLY the spoken voiceover narration prose. Do NOT include bracketed stage directions like [Camera zooms] or cues. "
-        "Weave the explicit engagement call-to-actions (CTAs) seamlessly into the high-IQ institutional narrative."
+        "You are an elite cinematic trading documentary director (in the style of Vox, MagnatesMedia, and ColdFusion). "
+        "MANDATORY RETENTION ENGINE (60-80% WATCHTIME GOAL): "
+        "1. THE FIRST 30 SECONDS (MOVEMENT 1): Must be an adrenaline-pumping, shocking COLD OPEN HOOK. Open directly with an alarming insider revelation, "
+        "a shocking monetary statistic ($350M liquidated in 4 seconds), and an intellectual challenge that disrupts everything the retail trader thinks they know. "
+        "Never say 'Welcome' or 'In this video' or academic pleasantries. Jump straight into the slaughterhouse mechanics. "
+        "2. CONTINUOUS SUSPENSE PACING: Speak with absolute authority, cold first-principles logic, authentic mathematical formulas, and zero generic marketing fluff. "
+        "3. Write ONLY the spoken voiceover narration prose. Do NOT include bracketed stage directions like [Camera zooms] or cues. "
+        "4. Weave the explicit engagement call-to-actions (CTAs) seamlessly into the high-IQ institutional narrative."
     )
 
     try:
@@ -269,12 +273,17 @@ def mix_ambient_suspense_audio(voice_path: Path, bgm_path: Path, out_path: Path)
         ], check=True)
         return
 
+    # Breathing sidechain ducking: BGM at 10% volume ducks smoothly when voice speaks, swells up during dramatic pauses
     cmd = [
         "ffmpeg", "-y",
         "-i", str(voice_path),
         "-stream_loop", "-1",
         "-i", str(bgm_path),
-        "-filter_complex", "[0:a]volume=1.5,alimiter=limit=0.98:attack=5:release=50[v];[1:a]volume=0.07[b];[v][b]amix=inputs=2:duration=first:dropout_transition=2[aout]",
+        "-filter_complex", 
+        "[0:a]volume=1.45,bass=g=5:f=110,alimiter=limit=0.98:attack=5:release=50[v];"
+        "[1:a]volume=0.10[b];"
+        "[b][v]sidechaincompress=threshold=0.07:ratio=6:attack=20:release=350[ducked_bgm];"
+        "[v][ducked_bgm]amix=inputs=2:duration=first:dropout_transition=2[aout]",
         "-map", "[aout]",
         "-c:a", "libmp3lame", "-b:a", "192k",
         str(out_path)
@@ -301,8 +310,8 @@ def load_verified_assets(assets_dir: Path):
     print(f"✓ Pure Assets Loaded: {len(hero_clips)} Hero clips, {len(bridge_clips)} Bridge clips.")
     return hero_clips, bridge_clips, bgm_path
 
-def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path):
-    """Assembles 15+ minute documentary with Waveform Pacing, Ken Burns transforms, and Kinetic Subtitles."""
+def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = ""):
+    """Assembles 15+ minute documentary with Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
     print(f"\n[4/5] Executing Waveform Retention Video Assembly (15+ Min, Zero Charts)...")
     temp_dir = Path("temp_render")
     segs_dir = temp_dir / "segments"
@@ -315,7 +324,7 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
     total_dur = float(json.loads(res.stdout).get("format", {}).get("duration", 960.0))
     print(f"✓ Total Duration: {total_dur:.1f}s ({total_dur/60:.2f} minutes) [TARGET > 15 MIN: YES]")
 
-    # 10 Contextual Movement Subtitle Headlines
+    # 10 Contextual Movement Subtitle Headlines (fallback)
     headlines = [
         f"★ {topic.upper()} ★",
         "THE EVOLUTIONARY DOPAMINE TRAP: WHY RETAIL FAILS",
@@ -350,7 +359,7 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
         curr_t += dur
         c_idx += 1
 
-    # Kinetic Gold Subtitles (ASS)
+    # Kinetic Spoken-Word Subtitles (ASS) with Universal Fonts & Gold Highlights
     ass_path = temp_dir / "kinetic.ass"
     header = """[Script Info]
 Title: Masterclass Subtitles
@@ -360,24 +369,50 @@ PlayResY: 1080
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Default,Arial Black,42,&H0000FFFF,&H000000FF,&H00000000,&H80000000,-1,0,0,0,100,100,1,0,1,3.5,2,2,40,40,85,1
+Style: Default,Liberation Sans,Arial,DejaVu Sans,44,&H00FFFFFF,&H000000FF,&H00000000,&H90000000,-1,0,0,0,100,100,1,0,1,3.5,2,2,40,40,75,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
     dialogues = []
-    for c in cuts:
-        m1, s1 = divmod(c["start"], 60)
+    clean_words = []
+    if script_text:
+        lines = [l.strip() for l in script_text.splitlines() if l.strip() and not l.strip().startswith("===")]
+        clean_words = " ".join(lines).split()
+
+    phrases = []
+    if clean_words:
+        chunk_size = 5
+        for i in range(0, len(clean_words), chunk_size):
+            chunk = " ".join(clean_words[i:i+chunk_size])
+            phrases.append(chunk)
+    else:
+        phrases = headlines
+
+    time_per_phrase = total_dur / len(phrases) if phrases else 2.5
+    for idx, phrase in enumerate(phrases):
+        t0 = idx * time_per_phrase
+        t1 = min((idx + 1) * time_per_phrase, total_dur)
+        if t0 >= total_dur:
+            break
+
+        m1, s1 = divmod(t0, 60)
         h1, m1 = divmod(m1, 60)
         cs1 = int((s1 - int(s1)) * 100)
         t_start = f"{int(h1)}:{int(m1):02d}:{int(s1):02d}.{cs1:02d}"
 
-        m2, s2 = divmod(c["end"], 60)
+        m2, s2 = divmod(t1, 60)
         h2, m2 = divmod(m2, 60)
         cs2 = int((s2 - int(s2)) * 100)
         t_end = f"{int(h2)}:{int(m2):02d}:{int(s2):02d}.{cs2:02d}"
 
-        dialogues.append(f"Dialogue: 0,{t_start},{t_end},Default,,0,0,0,,{c['headline']}")
+        clean_phrase = phrase.upper().replace("{", "").replace("}", "")
+        for kw in ["LIQUIDATED", "STOP LOSS", "ICEBERG", "ORDER BLOCK", "DARK POOL", "SMART MONEY", "CVD", "0DTE", "FVG", "TRAP", "BREAKOUT", "MILLION", "ALGORITHM"]:
+            if kw in clean_phrase:
+                clean_phrase = clean_phrase.replace(kw, f"{{\\c&H00D7FF&}}{kw}{{\\c&HFFFFFF&}}")
+
+        dialogues.append(f"Dialogue: 0,{t_start},{t_end},Default,,0,0,0,,{clean_phrase}")
+
     ass_path.write_text(header + "\n".join(dialogues) + "\n", encoding="utf-8")
 
     # Build complete pool of unique, non-overlapping scenes across all clips
@@ -478,11 +513,12 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     # Multiplex with ASS subtitles and ducked audio
     print(f"\n[5/5] Final Multiplexing & Kinetic Subtitle Burn...")
     ass_esc = str(ass_path.resolve()).replace("\\", "/").replace(":", "\\:")
+    sub_filter = f"subtitles='{ass_esc}'" if os.name == "nt" else f"subtitles='{ass_path.name}'"
     composite_cmd = [
         "ffmpeg", "-y",
         "-i", str(silent_full),
         "-i", str(audio_path),
-        "-vf", f"subtitles='{ass_esc}'",
+        "-vf", sub_filter,
         "-c:v", "libx264", "-preset", "veryfast", "-crf", "24", "-pix_fmt", "yuv420p",
         "-c:a", "aac", "-b:a", "192k",
         "-shortest",
@@ -559,9 +595,9 @@ def main():
     ducked_audio_path = Path(f"output/ducked_audio_job_{args.job_id}.mp3")
     mix_ambient_suspense_audio(raw_voice_path, bgm_path, ducked_audio_path)
 
-    # 5. Final 16-Minute Masterclass Assembly
+    # 5. Final 16-Minute Masterclass Assembly with Speech-Synchronized Dynamic Subtitles
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
-    render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video)
+    render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video, script_text=script_content)
 
     # 5.5 Pick a random custom thumbnail from the 1 - 1,000,000+ vault
     custom_thumb = select_random_thumbnail()
