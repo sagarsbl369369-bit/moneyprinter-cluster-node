@@ -127,7 +127,7 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
 
     sec_name = sec["name"]
     sec_key = sec.get("key", "orderflow")
-    print(f"\n[1/5] 🧠 Generating 16-Min Masterclass for: '{topic}'")
+    print(f"\n[1/5] 🧠 Generating Fast Alpha Masterclass (5-6 Min) for: '{topic}'")
     print(f"      🏛️ Sector: {sec_name} | Key: {sec_key}")
 
     primary_key = GROQ_KEYS[(job_id - 1) % len(GROQ_KEYS)]
@@ -136,7 +136,7 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
     system_prompt = (
         f"{sec['persona']} "
         "You are an elite cinematic trading documentary director (in the style of Vox, MagnatesMedia, and ColdFusion). "
-        "MANDATORY RETENTION ENGINE (60-80% WATCHTIME GOAL): "
+        "MANDATORY FAST ALPHA RETENTION ENGINE (75%+ COMPLETION GOAL): "
         "1. THE FIRST 30 SECONDS (MOVEMENT 1): Must be an adrenaline-pumping, shocking COLD OPEN HOOK. Open directly with an alarming insider revelation, "
         "a shocking monetary statistic ($350M liquidated in 4 seconds), and an intellectual challenge that disrupts everything the retail trader thinks they know. "
         "Never say 'Welcome' or 'In this video' or academic pleasantries. Jump straight into the slaughterhouse mechanics. "
@@ -146,11 +146,11 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
     )
 
     try:
-        # Build Phase 1 Prompt dynamically
+        # Build Fast Alpha 5-Movement Prompt (~800 words = 5.5 minutes)
         p1_lines = [
-            f"Write Movements 1 to 5 of an elite 16-minute Wall Street quantitative documentary masterclass on '{topic}'.",
+            f"Write an elite 5 to 6-minute Wall Street quantitative documentary masterclass on '{topic}'.",
             f"Target Trading Sector: {sec_name}.",
-            "Structure strictly into these 5 movements, each with a full 240-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
+            "Structure strictly into these 5 movements, each with a full 160-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
         ]
         for title, cta in sec["movements_p1"]:
             p1_lines.append(f"=== {title} ===")
@@ -159,44 +159,29 @@ def generate_15min_script(topic: str, job_id: int, channel: str = "") -> str:
         p1_lines.append("Write continuous, brilliant spoken narration prose for all 5 movements now:")
         p1_prompt = "\n".join(p1_lines)
 
-        print(f"  → Querying Groq Phase 1 (Movements 1-5) via 120B Reasoning with Key #{(job_id - 1) % 2 + 1}...")
+        print(f"  → Querying Groq Fast Alpha (Movements 1-5) via 120B Reasoning with Key #{(job_id - 1) % 2 + 1}...")
         try:
             p1_text = query_groq_api(p1_prompt, system_prompt, primary_key)
         except Exception as e:
             print(f"  ! Key 1 failed ({e}), rotating to Key 2...")
             p1_text = query_groq_api(p1_prompt, system_prompt, backup_key)
 
-        # Build Phase 2 Prompt dynamically
-        p2_lines = [
-            f"Write Movements 6 to 10 of an elite 16-minute Wall Street quantitative documentary masterclass on '{topic}'.",
-            f"Target Trading Sector: {sec_name}.",
-            "Structure strictly into these 5 movements, each with a full 240-word deeply analytical spoken paragraph packed with concrete mechanics and numbers:"
-        ]
-        for title, cta in sec["movements_p2"]:
-            p2_lines.append(f"=== {title} ===")
-            if cta:
-                p2_lines.append(f"(MANDATORY CTA: {cta})")
-        p2_lines.append("Write continuous, brilliant spoken narration prose for all 5 movements now:")
-        p2_prompt = "\n".join(p2_lines)
-
-        print(f"  → Querying Groq Phase 2 (Movements 6-10) via 120B Reasoning...")
-        try:
-            p2_text = query_groq_api(p2_prompt, system_prompt, backup_key)
-        except Exception as e:
-            print(f"  ! Key 2 failed ({e}), rotating to Key 1...")
-            p2_text = query_groq_api(p2_prompt, system_prompt, primary_key)
-
-        full_script = f"{p1_text}\n\n{p2_text}"
-        words = len(full_script.split())
-        est_min = round(words / 140, 1)
-        print(f"✓ AI Script Complete via Groq 120B! Total Words: {words} (~{est_min} minutes)")
-        if words > 1600:
-            return full_script
+        words = len(p1_text.split())
+        est_min = round(words / 145, 1)
+        print(f"✓ AI Fast Alpha Script Complete! Total Words: {words} (~{est_min} minutes)")
+        if words > 500:
+            return p1_text
     except Exception as e:
         print(f"[!] Groq generation error ({e}). Deploying bespoke Sector Procedural Masterclass...")
 
     if get_procedural_masterclass:
-        return get_procedural_masterclass(sec_key, topic)
+        full_procedural = get_procedural_masterclass(sec_key, topic)
+        # Take first 5 movements for 5-6 min Fast Alpha duration
+        chunks = [c.strip() for c in full_procedural.split("===") if c.strip()]
+        if len(chunks) > 5:
+            return "=== " + "=== ".join(chunks[:5])
+        return full_procedural
+    return generate_flagship_vault_script(topic)
     return generate_flagship_vault_script(topic)
 
 def generate_flagship_vault_script(topic: str, sec_key: str = "orderflow") -> str:
@@ -319,8 +304,8 @@ def load_verified_assets(assets_dir: Path):
     return hero_clips, bridge_clips, bgm_path
 
 def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: list, topic: str, out_path: Path, script_text: str = ""):
-    """Assembles 15+ minute documentary with Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
-    print(f"\n[4/5] Executing Waveform Retention Video Assembly (15+ Min, Zero Charts)...")
+    """Assembles 5 to 6-minute Fast Alpha Masterclass with Waveform Pacing, Ken Burns transforms, and Speech-Synchronized Kinetic Subtitles."""
+    print(f"\n[4/5] Executing Waveform Retention Video Assembly (5-6 Min Fast Alpha Mode)...")
     temp_dir = Path("temp_render")
     segs_dir = temp_dir / "segments"
     segs_dir.mkdir(parents=True, exist_ok=True)
@@ -329,8 +314,8 @@ def render_16min_masterclass(audio_path: Path, hero_clips: list, bridge_clips: l
     # Audio duration
     probe_cmd = ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "json", str(audio_path)]
     res = subprocess.run(probe_cmd, capture_output=True, text=True)
-    total_dur = float(json.loads(res.stdout).get("format", {}).get("duration", 960.0))
-    print(f"✓ Total Duration: {total_dur:.1f}s ({total_dur/60:.2f} minutes) [TARGET > 15 MIN: YES]")
+    total_dur = float(json.loads(res.stdout).get("format", {}).get("duration", 330.0))
+    print(f"✓ Total Duration: {total_dur:.1f}s ({total_dur/60:.2f} minutes) [FAST ALPHA 5-6 MIN: YES]")
 
     # 10 Contextual Movement Subtitle Headlines (fallback)
     headlines = [
