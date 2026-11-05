@@ -886,7 +886,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     world_filters = [
         "eq=contrast=1.15:brightness=-0.02:saturation=1.12",                       # U1: Bloomberg Cyan
         "colorbalance=rs=0.14:gs=-0.05:bs=-0.08,eq=contrast=1.22",                # U2: Wall Street Crimson
-        "colorbalance=bs=0.16:ms=0.08:rs=0.05,eq=saturation=1.25",                # U3: Tokyo Globex
+        "colorbalance=bs=0.16:bm=0.08:rs=0.05,eq=saturation=1.25",                # U3: Tokyo Globex
         "colorbalance=gs=0.10:rs=0.08:bs=-0.06,eq=contrast=1.16",                 # U4: Gold Vault
         "colorbalance=rs=0.10:gs=0.08:bs=-0.20,eq=contrast=1.20",                 # U5: HFT Radar
         "curves=vintage,eq=contrast=1.12:saturation=0.92",                          # U6: 35mm Floor
@@ -912,7 +912,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     with open(concat_list, "w", encoding="utf-8") as f_out:
         for c, scene in assigned_cuts:
             seg_file = segs_dir / f"seg_{c['idx']:04d}.mp4"
-            is_chart = "semantic_" in scene.get("scene_id", "") or "chart" in str(scene["file"]).lower()
+            is_chart = "semantic_" in scene.get("scene_id", "") or "chart" in str(scene["file"]).lower() or "cold_open" in scene.get("scene_id", "")
             vf_str = f"{scene['tf']},scale=1920:1080,fps=30,format=yuv420p" if is_chart else f"{scene['tf']},{color_grade},scale=1920:1080,fps=30,format=yuv420p"
             cmd = [
                 "ffmpeg", "-y",
