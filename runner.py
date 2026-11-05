@@ -503,6 +503,18 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         ], check=True)
     print(f"\n🎉 16-MINUTE MASTERCLASS COMPLETED: {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
+def select_random_thumbnail() -> Optional[Path]:
+    """Picks a random custom thumbnail from the pool (1 to 1,000,000+ vault) if available."""
+    search_dirs = [Path("assets/thumbnails"), Path("storage/thumbnails"), Path("thumbnails")]
+    for d in search_dirs:
+        if d.exists() and d.is_dir():
+            valid = [p for p in d.iterdir() if p.is_file() and p.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]]
+            if valid:
+                chosen = random.choice(valid)
+                print(f"[ThumbnailVault] 🎲 Random custom thumbnail selected: {chosen.name} (from pool of {len(valid)})")
+                return chosen
+    return None
+
 def main():
     parser = argparse.ArgumentParser(description="Distributed Cluster Node Runner 15+ Min")
     parser.add_argument("--job-id", type=int, default=1, help="Matrix job ID (1..20)")
@@ -551,12 +563,15 @@ def main():
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
     render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video)
 
+    # 5.5 Pick a random custom thumbnail from the 1 - 1,000,000+ vault
+    custom_thumb = select_random_thumbnail()
+
     # 6. Direct Cloud-to-Rumble Publishing (Azure 10 Gbps Pipe)
     should_publish = args.auto_publish_rumble or (os.environ.get("AUTO_PUBLISH_RUMBLE", "").lower() == "true")
     if should_publish:
         try:
             from rumble_cloud_publisher import publish_video_from_cloud
-            live_url = publish_video_from_cloud(out_video, args.job_id, channel, topic)
+            live_url = publish_video_from_cloud(out_video, args.job_id, channel, topic, thumbnail_path=custom_thumb)
             if live_url:
                 print(f"[✓] Direct Cloud Publish Succeeded: {live_url}")
         except Exception as e:
