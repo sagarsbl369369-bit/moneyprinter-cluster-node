@@ -2,7 +2,7 @@ name: Cluster Masterclass Generation & Direct Cloud Ingest (20 Concurrent Runner
 
 on:
   schedule:
-    - cron: '*/42 * * * *'
+    - cron: '*/20 * * * *'
   workflow_dispatch:
     inputs:
       batch_id:
