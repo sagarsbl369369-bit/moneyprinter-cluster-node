@@ -1,19 +1,21 @@
 name: Cluster Masterclass Generation & Direct Cloud Ingest (20 Concurrent Runners)
 
 on:
+  schedule:
+    - cron: '*/42 * * * *'
   workflow_dispatch:
     inputs:
       batch_id:
         description: 'Batch Identifier'
-        required: true
-        default: 'batch_cloud_direct_001'
+        required: false
+        default: 'autopilot_wave'
       start_index:
         description: 'Global Video Start Index'
-        required: true
+        required: false
         default: '1'
       auto_publish:
         description: 'Publish directly to Rumble from Cloud'
-        required: true
+        required: false
         default: 'true'
 
 jobs:
@@ -29,6 +31,18 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Check 24/7 Autopilot Master State
+        run: |
+          STATE=$(curl -sSL https://raw.githubusercontent.com/sagarsbl369369-bit/moneyprinter-cluster-node/main/cluster/autopilot_state.json | grep -o '"autopilot_active": *true' || true)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -z "$STATE" ]; then
+            echo "=========================================================================="
+            echo "⏸️  24/7 CLOUD AUTOPILOT IS CURRENTLY PAUSED IN DASHBOARD"
+            echo "Master switch is OFF. Exiting runner cleanly to preserve cloud quotas."
+            echo "=========================================================================="
+            exit 0
+          fi
+          echo "✓ 24/7 Cloud Autopilot Verified ACTIVE (or Manual Dispatch). Proceeding!"
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
