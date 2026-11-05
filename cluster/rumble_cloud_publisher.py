@@ -150,19 +150,29 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         file_input = page.wait_for_selector("input[type='file']", timeout=30000)
         file_input.set_input_files(str(video_path.resolve()))
 
-        # 1.5 Attach Random Custom Thumbnail (if provided from vault)
+        # 1.5 Attach Master Custom Thumbnail (THE ALGO TRAP / Vault)
         if thumbnail_path and thumbnail_path.exists():
-            try:
-                thumb_inputs = page.query_selector_all("input[type='file']")
-                for inp in thumb_inputs:
-                    accept_attr = (inp.get_attribute("accept") or "").lower()
-                    name_attr = (inp.get_attribute("name") or "").lower()
-                    if "image" in accept_attr or "thumb" in name_attr:
-                        inp.set_input_files(str(thumbnail_path.resolve()))
-                        print(f"[CloudPublisher] 🖼️ Random custom thumbnail attached: {thumbnail_path.name}")
+            print(f"[CloudPublisher] 🖼️ Attaching Master Thumbnail: {thumbnail_path.name} ({thumbnail_path.stat().st_size} bytes)...")
+            thumb_attached = False
+            for _ in range(3):
+                try:
+                    thumb_inputs = page.query_selector_all("input[type='file']")
+                    for inp in thumb_inputs:
+                        accept_attr = (inp.get_attribute("accept") or "").lower()
+                        name_attr = (inp.get_attribute("name") or "").lower()
+                        inp_id = (inp.get_attribute("id") or "").lower()
+                        if "video" in accept_attr or "mp4" in accept_attr:
+                            continue
+                        if "image" in accept_attr or "thumb" in name_attr or "thumb" in inp_id or len(thumb_inputs) > 1:
+                            inp.set_input_files(str(thumbnail_path.resolve()))
+                            print(f"[CloudPublisher] ✓ Master custom thumbnail attached to input '{name_attr or inp_id}'!")
+                            thumb_attached = True
+                            break
+                    if thumb_attached:
                         break
-            except Exception as e:
-                print(f"[CloudPublisher] ⚠️ Notice: Thumbnail attach: {e}")
+                except Exception as e:
+                    print(f"[CloudPublisher] ⚠️ Thumbnail attach query: {e}")
+                time.sleep(1)
 
         # 2. Fill Metadata
         title_input = page.wait_for_selector("input[name='title'], #title", timeout=15000)
@@ -175,17 +185,72 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         if tags_input:
             tags_input.fill(seo["tags"])
 
-        # 3. Lock Sub-Channel (Zero Profile 0)
-        print(f"[CloudPublisher] 🔒 Locking Sub-Channel: '{target_title}' (#{target_id})...")
-        page.evaluate(f"""() => {{
-            const defaultRadio = document.querySelector("#channelId_");
-            if (defaultRadio) defaultRadio.checked = false;
-            const subRadio = document.querySelector("#channelId_{target_id}");
-            if (subRadio) {{
-                subRadio.checked = true;
-                subRadio.dispatchEvent(new Event('change', {{bubbles: true}}));
-            }}
-        }}""")
+        # 3. Lock Sub-Channel Strictly (NEVER upload to User Personal Profile '0')
+        print(f"[CloudPublisher] 🔒 Locking Sub-Channel strictly: '{target_title}' (#{target_id})...")
+        channel_locked = False
+        try:
+            res = page.evaluate(f"""() => {{
+                // 1. Force uncheck user personal profile default radio
+                const defaultRadios = [
+                    document.querySelector("#channelId_"),
+                    document.querySelector("input[name='channelId'][value='']"),
+                    document.querySelector("input[name='channelId'][value='0']")
+                ];
+                for (const d of defaultRadios) {{
+                    if (d) {{ d.checked = false; d.removeAttribute('checked'); }}
+                }}
+
+                // 2. Select target sub-channel radio by ID
+                let target = document.querySelector("input[name='channelId'][value='{target_id}']");
+                
+                // 3. If ID not matched directly, find by channel title inside label
+                if (!target) {{
+                    const radios = document.querySelectorAll("input[name='channelId']");
+                    for (const r of radios) {{
+                        const lbl = document.querySelector(`label[for='${{r.id}}']`) || r.closest('label') || r.parentElement;
+                        if (lbl && (lbl.innerText.includes('{target_title}') || lbl.innerText.toLowerCase().includes('{target_title.lower()}'))) {{
+                            target = r;
+                            break;
+                        }}
+                    }}
+                }}
+
+                if (target) {{
+                    target.checked = true;
+                    target.setAttribute('checked', 'checked');
+                    const lbl = document.querySelector(`label[for='${{target.id}}']`) || target.closest('label') || target.parentElement;
+                    if (lbl) lbl.click();
+                    target.dispatchEvent(new Event('change', {{bubbles: true}}));
+                    target.dispatchEvent(new Event('click', {{bubbles: true}}));
+                    return {{ success: true, id: target.id, val: target.value }};
+                }}
+                return {{ success: false }};
+            }}""")
+
+            # Fallback direct Playwright click on label if available
+            try:
+                page.click(f"input[name='channelId'][value='{target_id}']", timeout=2000, force=True)
+            except Exception:
+                try:
+                    page.click(f"label:has-text('{target_title}')", timeout=2000, force=True)
+                except Exception:
+                    pass
+
+            # Verification
+            time.sleep(0.5)
+            is_sub_checked = page.evaluate(f"""() => {{
+                const target = document.querySelector("input[name='channelId'][value='{target_id}']");
+                const def = document.querySelector("input[name='channelId'][value='']") || document.querySelector("#channelId_");
+                return target ? target.checked : (def ? !def.checked : true);
+            }}""")
+            if is_sub_checked:
+                print(f"[CloudPublisher] ✓ Sub-Channel verified locked: '{target_title}' (#{target_id})")
+                channel_locked = True
+            else:
+                print(f"[CloudPublisher] ⚠️ Notice: Sub-channel radio checked state returned false; force-clicking label...")
+                page.click(f"label:has-text('{target_title}')", timeout=3000, force=True)
+        except Exception as ce:
+            print(f"[CloudPublisher] Sub-channel lock notice: {ce}")
 
         # 4. Wait for Transfer (Azure speed: ~15-25 seconds!)
         print("[CloudPublisher] ⏳ Waiting for transfer completion (Azure ultra-high-speed)...")
