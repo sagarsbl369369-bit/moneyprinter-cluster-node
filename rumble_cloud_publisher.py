@@ -79,10 +79,11 @@ Welcome to {channel_title}. In this institutional masterclass, we break down hig
     tags = "smart money concepts, order block, price action, trading strategy, ict, forex, crypto, day trading"
     return {"title": raw_title, "description": desc, "tags": tags}
 
-def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, topic: str) -> Optional[str]:
+def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, topic: str, thumbnail_path: Optional[Path] = None) -> Optional[str]:
     """
     Executes direct Cloud-to-Rumble publication from inside the GitHub Actions runner.
     Leverages Microsoft Azure's 10 Gbps symmetric pipe for 15-20s upload speeds.
+    Auto-attaches a random custom thumbnail from the 1 - 1,000,000 thumbnail vault.
     """
     if not sync_playwright:
         print("[CloudPublisher] ❌ Playwright is not installed in the environment!")
@@ -148,6 +149,20 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         print(f"[CloudPublisher] 📎 Uploading {video_path.name} ({file_size_mb:.1f} MB) via Azure 10 Gbps Pipe...")
         file_input = page.wait_for_selector("input[type='file']", timeout=30000)
         file_input.set_input_files(str(video_path.resolve()))
+
+        # 1.5 Attach Random Custom Thumbnail (if provided from vault)
+        if thumbnail_path and thumbnail_path.exists():
+            try:
+                thumb_inputs = page.query_selector_all("input[type='file']")
+                for inp in thumb_inputs:
+                    accept_attr = (inp.get_attribute("accept") or "").lower()
+                    name_attr = (inp.get_attribute("name") or "").lower()
+                    if "image" in accept_attr or "thumb" in name_attr:
+                        inp.set_input_files(str(thumbnail_path.resolve()))
+                        print(f"[CloudPublisher] 🖼️ Random custom thumbnail attached: {thumbnail_path.name}")
+                        break
+            except Exception as e:
+                print(f"[CloudPublisher] ⚠️ Notice: Thumbnail attach: {e}")
 
         # 2. Fill Metadata
         title_input = page.wait_for_selector("input[name='title'], #title", timeout=15000)
