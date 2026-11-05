@@ -1,9 +1,9 @@
 {
-  "autopilot_active": false,
+  "autopilot_active": true,
   "interval_minutes": 42,
   "daily_target": 4080,
   "active_nodes": 6,
   "channels_covered": 120,
-  "last_updated": "2026-11-05T13:58:00Z",
+  "last_updated": "2026-11-05T08:32:35Z",
   "note": "Controlled via Dashboard 24/7 Autopilot Master Switch"
 }
