@@ -549,14 +549,23 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     print(f"\n🎉 16-MINUTE MASTERCLASS COMPLETED: {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
 def select_random_thumbnail() -> Optional[Path]:
-    """Picks a random custom thumbnail from the pool (1 to 1,000,000+ vault) if available."""
+    """Picks master user thumbnail (THE ALGO TRAP) or custom vault thumbnail for every video."""
+    for p in [
+        Path("assets/thumbnails/thumb_master_algo_trap.jpg"),
+        Path("thumb_master_algo_trap.jpg"),
+        Path("storage/thumbnails/thumb_master_algo_trap.jpg")
+    ]:
+        if p.exists() and p.is_file():
+            print(f"[ThumbnailVault] 🖼️ Master user thumbnail selected for upload: {p.name} ({p.stat().st_size} bytes)")
+            return p
+
     search_dirs = [Path("assets/thumbnails"), Path("storage/thumbnails"), Path("thumbnails")]
     for d in search_dirs:
         if d.exists() and d.is_dir():
             valid = [p for p in d.iterdir() if p.is_file() and p.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]]
             if valid:
                 chosen = random.choice(valid)
-                print(f"[ThumbnailVault] 🎲 Random custom thumbnail selected: {chosen.name} (from pool of {len(valid)})")
+                print(f"[ThumbnailVault] 🎲 Vault custom thumbnail selected: {chosen.name} (from pool of {len(valid)})")
                 return chosen
     return None
 
