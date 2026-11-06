@@ -145,10 +145,17 @@ jobs:
         if: steps.hardlock_guard.outputs.approved == 'true'
         env:
           RUMBLE_SESSION_B64: ${{ secrets.RUMBLE_SESSION_B64 }}
+          YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
         run: |
+          if [ -n "$YOUTUBE_COOKIES_B64" ]; then
+            echo "$YOUTUBE_COOKIES_B64" | base64 -d > youtube_cookies.txt
+            mkdir -p storage
+            cp youtube_cookies.txt storage/youtube_cookies.txt
+            echo "✓ Decoded authenticated YouTube cookies on cloud runner!"
+          fi
           GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
           echo "Executing Global Viral Channel Job: #$GLOBAL_ID (Matrix: ${{ matrix.job_id }}, Start Index: ${{ inputs.start_index }})"
           if [ -f "youtube_ingest_runner.py" ]; then
