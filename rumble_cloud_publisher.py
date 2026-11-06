@@ -104,20 +104,20 @@ def publish_video_from_cloud(
         print("[CloudPublisher] ❌ Playwright is not installed in the environment!")
         return None
 
-    session_b64 = os.environ.get("RUMBLE_SESSION_B64")
-    if not session_b64:
-        print("[CloudPublisher] ⚠️ RUMBLE_SESSION_B64 secret not found! Skipping cloud upload.")
-        return None
+    session_file = Path("/tmp/rumble_session.json") if os.name != "nt" else Path("storage/rumble_session.json")
+    if not session_file.exists():
+        session_b64 = os.environ.get("RUMBLE_SESSION_B64")
+        if not session_b64:
+            print("[CloudPublisher] ⚠️ RUMBLE_SESSION_B64 secret or storage/rumble_session.json not found! Skipping cloud upload.")
+            return None
+        session_file.parent.mkdir(parents=True, exist_ok=True)
+        session_file.write_bytes(base64.b64decode(session_b64))
 
     # Stagger delay to prevent concurrent lock contention on Rumble (15s offset per job)
     stagger_sec = ((job_id - 1) % 5) * 8
     if stagger_sec > 0:
         print(f"[CloudPublisher] ⏳ Applying anti-collision stagger delay: {stagger_sec}s...")
         time.sleep(stagger_sec)
-
-    session_file = Path("/tmp/rumble_session.json") if os.name != "nt" else Path("storage/rumble_session_cloud.json")
-    session_file.parent.mkdir(parents=True, exist_ok=True)
-    session_file.write_bytes(base64.b64decode(session_b64))
 
     ch_info = get_subchannel_id(job_id, channel_name)
     target_id = target_channel_id or ch_info["id"]
