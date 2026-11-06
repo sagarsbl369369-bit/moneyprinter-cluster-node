@@ -65,8 +65,14 @@ def generate_seo_metadata(topic: str, channel_title: str, job_id: int) -> Dict[s
     desc = f"""🔥 Masterclass Episode #{job_id}: {topic}
 Welcome to {channel_title}. In this institutional masterclass, we break down high-level order flow, central bank liquidity algorithms, and asymmetric risk models.
 
+💬 TRADER ENGAGEMENT QUESTION:
+Which session do you struggle with the most — London Open or New York Open? Drop your primary trading asset (EURUSD, NQ, Gold, BTC) in the comments below, and our algorithmic desk will analyze the order block signatures in our next masterclass!
+
+🔔 Follow {channel_title} & hit the bell for daily institutional SMC breakdowns.
+
 ⏱️ CHAPTERS & TIMESTAMPS:
-00:00 - The High-Frequency Microstructure
+00:00 - Institutional Cold-Open Shock Hook
+00:45 - The High-Frequency Microstructure
 03:15 - Identifying Institutional Order Blocks
 07:45 - Fair Value Gap Delivery & Algorithmic Exploits
 11:30 - Asymmetric 1:3.5 Risk Model Execution
@@ -74,25 +80,38 @@ Welcome to {channel_title}. In this institutional masterclass, we break down hig
 
 ⚠️ DISCLAIMER: Educational purposes only. Not financial advice.
 
-#SmartMoneyConcepts #TradingMasterclass #OrderBlock #PriceAction #Forex #Crypto"""
+#SmartMoneyConcepts #TradingMasterclass #OrderBlock #PriceAction #Forex #Crypto #ICT"""
 
     tags = "smart money concepts, order block, price action, trading strategy, ict, forex, crypto, day trading"
     return {"title": raw_title, "description": desc, "tags": tags}
 
-def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, topic: str, thumbnail_path: Optional[Path] = None) -> Optional[str]:
+def publish_video_from_cloud(
+    video_path: Path, 
+    job_id: int, 
+    channel_name: str, 
+    topic: str, 
+    thumbnail_path: Optional[Path] = None,
+    seo_override: Optional[Dict[str, Any]] = None,
+    target_channel_id: Optional[str] = None
+) -> Optional[str]:
     """
     Executes direct Cloud-to-Rumble publication from inside the GitHub Actions runner.
     Leverages Microsoft Azure's 10 Gbps symmetric pipe for 15-20s upload speeds.
-    Auto-attaches a random custom thumbnail from the 1 - 1,000,000 thumbnail vault.
+    Auto-attaches a random custom thumbnail or organic video frame.
+    Supports custom SEO override with 5 Mid-Roll breakpoints.
     """
     if not sync_playwright:
         print("[CloudPublisher] ❌ Playwright is not installed in the environment!")
         return None
 
-    session_b64 = os.environ.get("RUMBLE_SESSION_B64")
-    if not session_b64:
-        print("[CloudPublisher] ⚠️ RUMBLE_SESSION_B64 secret not found! Skipping cloud upload.")
-        return None
+    session_file = Path("/tmp/rumble_session.json") if os.name != "nt" else Path("storage/rumble_session.json")
+    if not session_file.exists():
+        session_b64 = os.environ.get("RUMBLE_SESSION_B64")
+        if not session_b64:
+            print("[CloudPublisher] ⚠️ RUMBLE_SESSION_B64 secret or storage/rumble_session.json not found! Skipping cloud upload.")
+            return None
+        session_file.parent.mkdir(parents=True, exist_ok=True)
+        session_file.write_bytes(base64.b64decode(session_b64))
 
     # Stagger delay to prevent concurrent lock contention on Rumble (15s offset per job)
     stagger_sec = ((job_id - 1) % 5) * 8
@@ -100,14 +119,10 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         print(f"[CloudPublisher] ⏳ Applying anti-collision stagger delay: {stagger_sec}s...")
         time.sleep(stagger_sec)
 
-    session_file = Path("/tmp/rumble_session.json") if os.name != "nt" else Path("storage/rumble_session_cloud.json")
-    session_file.parent.mkdir(parents=True, exist_ok=True)
-    session_file.write_bytes(base64.b64decode(session_b64))
-
     ch_info = get_subchannel_id(job_id, channel_name)
-    target_id = ch_info["id"]
-    target_title = ch_info["title"]
-    seo = generate_seo_metadata(topic, target_title, job_id)
+    target_id = target_channel_id or ch_info["id"]
+    target_title = channel_name if target_channel_id else ch_info["title"]
+    seo = seo_override if seo_override else generate_seo_metadata(topic, target_title, job_id)
 
     file_size_mb = video_path.stat().st_size / (1024 * 1024)
     print("\n" + "=" * 70)
@@ -173,6 +188,8 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
                 except Exception as e:
                     print(f"[CloudPublisher] ⚠️ Thumbnail attach query: {e}")
                 time.sleep(1)
+        else:
+            print("[CloudPublisher] 🌿 ZERO-THUMBNAIL ORGANIC MODE: Zero custom thumbnail. Rumble will auto-generate native video frame!")
 
         # 2. Fill Metadata
         title_input = page.wait_for_selector("input[name='title'], #title", timeout=15000)
@@ -265,22 +282,51 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
 
         time.sleep(2)
 
-        # 5. Step 1 Submit
+        # 5. Step 1 Submit (with Groove overlay annihilation & JS click)
         print("[CloudPublisher] ➡️ Submitting Step 1...")
-        page.click("#submitForm")
+        try:
+            page.evaluate("""() => {
+                document.querySelectorAll("iframe[id*='groove'], div[id*='groove'], .groove-widget, #groove-container, [class*='groove']").forEach(e => e.remove());
+                const btn = document.querySelector("#submitForm");
+                if (btn) {
+                    btn.scrollIntoView();
+                    btn.removeAttribute('disabled');
+                    btn.click();
+                }
+            }""")
+        except Exception as e:
+            print(f"[CloudPublisher] Direct DOM submit notice: {e}")
+        try:
+            page.click("#submitForm", force=True, timeout=10000)
+        except Exception:
+            pass
         time.sleep(3)
 
-        # 6. Step 2 Licensing & Rights
-        print("[CloudPublisher] 📜 Configuring Licensing & Rights...")
+        # 6. Step 2 Licensing & Rights (Exclusive Video Management for Max Ad Fill & Yahoo/MSN Syndication)
+        print("[CloudPublisher] 📜 Configuring Licensing & Rights (Exclusive Video Management: Value 1)...")
         try:
             page.wait_for_selector("input[name='license'], #crights, #cterms", timeout=45000)
-            page.click("input[name='license'][value='2'], div:has-text('Rumble Only')", timeout=8000)
+            # Prioritize Value 1 (Exclusive Video Management) for maximum ad fills across Rumble & global syndication
+            try:
+                page.click("input[name='license'][value='1'], div:has-text('Exclusive Video Management'), div:has-text('Video Management (excluding YouTube)')", timeout=5000)
+            except Exception:
+                page.click("input[name='license'][value='2'], div:has-text('Rumble Only')", timeout=4000)
         except Exception as e:
             print(f"[CloudPublisher] License select notice: {e}")
 
         page.evaluate("""() => {
-            const lic = document.querySelector("input[name='license'][value='2']");
-            if (lic) { lic.checked = true; lic.dispatchEvent(new Event('change', {bubbles: true})); }
+            // Select Value 1: Exclusive Video Management (Highest ad fills & earnings)
+            const lic1 = document.querySelector("input[name='license'][value='1']");
+            const lic2 = document.querySelector("input[name='license'][value='2']");
+            if (lic1) {
+                lic1.checked = true;
+                lic1.dispatchEvent(new Event('change', {bubbles: true}));
+                lic1.dispatchEvent(new Event('click', {bubbles: true}));
+            } else if (lic2) {
+                lic2.checked = true;
+                lic2.dispatchEvent(new Event('change', {bubbles: true}));
+                lic2.dispatchEvent(new Event('click', {bubbles: true}));
+            }
             const cr = document.getElementById('crights');
             if (cr && !cr.checked) { cr.checked = true; cr.dispatchEvent(new Event('change', {bubbles: true})); }
             const ct = document.getElementById('cterms');
@@ -291,6 +337,7 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         # 7. Final Publish
         print("[CloudPublisher] 🚀 Submitting final publish request (#submitForm2)...")
         page.evaluate("""() => {
+            document.querySelectorAll("iframe[id*='groove'], div[id*='groove'], .groove-widget, #groove-container, [class*='groove']").forEach(e => e.remove());
             const btn = document.querySelector("#submitForm2");
             if (btn) {
                 btn.scrollIntoView();
