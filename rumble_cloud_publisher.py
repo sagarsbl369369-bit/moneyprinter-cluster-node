@@ -179,6 +179,8 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
                 except Exception as e:
                     print(f"[CloudPublisher] ⚠️ Thumbnail attach query: {e}")
                 time.sleep(1)
+        else:
+            print("[CloudPublisher] 🌿 ZERO-THUMBNAIL ORGANIC MODE: Zero custom thumbnail. Rumble will auto-generate native video frame!")
 
         # 2. Fill Metadata
         title_input = page.wait_for_selector("input[name='title'], #title", timeout=15000)
