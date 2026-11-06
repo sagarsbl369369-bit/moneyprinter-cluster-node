@@ -265,9 +265,24 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
 
         time.sleep(2)
 
-        # 5. Step 1 Submit
+        # 5. Step 1 Submit (with Groove overlay annihilation & JS click)
         print("[CloudPublisher] ➡️ Submitting Step 1...")
-        page.click("#submitForm")
+        try:
+            page.evaluate("""() => {
+                document.querySelectorAll("iframe[id*='groove'], div[id*='groove'], .groove-widget, #groove-container, [class*='groove']").forEach(e => e.remove());
+                const btn = document.querySelector("#submitForm");
+                if (btn) {
+                    btn.scrollIntoView();
+                    btn.removeAttribute('disabled');
+                    btn.click();
+                }
+            }""")
+        except Exception as e:
+            print(f"[CloudPublisher] Direct DOM submit notice: {e}")
+        try:
+            page.click("#submitForm", force=True, timeout=10000)
+        except Exception:
+            pass
         time.sleep(3)
 
         # 6. Step 2 Licensing & Rights (Exclusive Video Management for Max Ad Fill & Yahoo/MSN Syndication)
@@ -305,6 +320,7 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
         # 7. Final Publish
         print("[CloudPublisher] 🚀 Submitting final publish request (#submitForm2)...")
         page.evaluate("""() => {
+            document.querySelectorAll("iframe[id*='groove'], div[id*='groove'], .groove-widget, #groove-container, [class*='groove']").forEach(e => e.remove());
             const btn = document.querySelector("#submitForm2");
             if (btn) {
                 btn.scrollIntoView();
