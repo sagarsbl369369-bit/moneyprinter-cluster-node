@@ -977,17 +977,132 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
         ], check=True)
     print(f"\n🎉 16-MINUTE MASTERCLASS COMPLETED: {out_path} ({out_path.stat().st_size / 1e6:.1f} MB)")
 
-def select_random_thumbnail() -> Optional[Path]:
-    """Picks master user thumbnail (THE ALGO TRAP) or custom vault thumbnail for every video."""
-    for p in [
-        Path("assets/thumbnails/thumb_master_algo_trap.jpg"),
-        Path("thumb_master_algo_trap.jpg"),
-        Path("storage/thumbnails/thumb_master_algo_trap.jpg")
-    ]:
-        if p.exists() and p.is_file():
-            print(f"[ThumbnailVault] 🖼️ Master user thumbnail selected for upload: {p.name} ({p.stat().st_size} bytes)")
-            return p
+def generate_dynamic_high_ctr_thumbnail(topic: str, channel: str, out_path: Path) -> Optional[Path]:
+    """Generates a bespoke, hyper-clickable, topic-matched Wall Street thumbnail with dynamic charts & shock stats."""
+    try:
+        from PIL import Image, ImageDraw, ImageFont
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        width, height = 1280, 720
+        
+        # 1. Base Dark Institutional Gradient Canvas
+        img = Image.new("RGB", (width, height), color=(10, 14, 23))
+        draw = ImageDraw.Draw(img)
+        for y in range(height):
+            ratio = y / height
+            r = int(10 + 12 * ratio)
+            g = int(14 + 18 * ratio)
+            b = int(23 + 35 * ratio)
+            draw.line([(0, y), (width, y)], fill=(r, g, b))
+            
+        # 2. Draw sleek institutional Candlestick chart in background
+        num_candles = 36
+        candle_w = 22
+        gap = 12
+        start_x = 40
+        base_price = 380
+        trend = random.choice([1, -1])
+        
+        for i in range(num_candles):
+            c_x = start_x + i * (candle_w + gap)
+            change = random.randint(-25, 30) + (trend * 3)
+            open_p = base_price
+            close_p = open_p + change
+            high_p = max(open_p, close_p) + random.randint(5, 35)
+            low_p = min(open_p, close_p) - random.randint(5, 35)
+            base_price = max(180, min(560, close_p))
+            
+            is_bull = close_p >= open_p
+            color = (0, 230, 118) if is_bull else (255, 59, 48)
+            wick_color = (0, 200, 100) if is_bull else (220, 40, 40)
+            
+            draw.line([(c_x + candle_w//2, low_p), (c_x + candle_w//2, high_p)], fill=wick_color, width=3)
+            y_top = min(open_p, close_p)
+            y_bottom = max(open_p, close_p)
+            draw.rectangle([(c_x, y_top), (c_x + candle_w, y_bottom)], fill=color, outline=(255, 255, 255, 50))
+            
+        # Order Block Shaded Zone
+        ob_y1 = random.randint(240, 340)
+        ob_y2 = ob_y1 + random.randint(60, 100)
+        draw.rectangle([(200, ob_y1), (1100, ob_y2)], fill=None, outline=(0, 229, 255), width=2)
+        draw.text((220, ob_y1 + 10), "INSTITUTIONAL ORDER BLOCK [H4]", fill=(0, 229, 255))
 
+        # Dark translucent vignette overlay over chart for text readability
+        overlay = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+        ov_draw = ImageDraw.Draw(overlay)
+        ov_draw.rectangle([(0, 0), (width, height)], fill=(5, 8, 15, 140))
+        ov_draw.rectangle([(0, 0), (850, height)], fill=(5, 8, 15, 120))
+        img = Image.alpha_composite(img.convert("RGBA"), overlay).convert("RGB")
+        draw = ImageDraw.Draw(img)
+
+        # 3. Dynamic Headline Extraction
+        words = topic.replace(":", " ").replace("-", " ").replace("|", " ").split()
+        clean_words = [w.upper() for w in words if w.lower() not in ["the", "how", "why", "of", "and", "at", "in", "to", "for", "a", "an"]]
+        
+        line1 = " ".join(clean_words[:2]) if clean_words else "SMART MONEY"
+        line2 = " ".join(clean_words[2:4]) if len(clean_words) >= 4 else "ALGORITHM EXPOSED"
+        
+        # Load fonts
+        font_large = None
+        font_badge = None
+        font_stat = None
+        for fpath in ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "C:\\Windows\\Fonts\\impact.ttf", "C:\\Windows\\Fonts\\arialbd.ttf"]:
+            if Path(fpath).exists():
+                try:
+                    font_large = ImageFont.truetype(fpath, 76)
+                    font_badge = ImageFont.truetype(fpath, 32)
+                    font_stat = ImageFont.truetype(fpath, 42)
+                    break
+                except Exception:
+                    pass
+        if not font_large:
+            font_large = ImageFont.load_default()
+            font_badge = font_large
+            font_stat = font_large
+
+        # 4. Top Badge
+        badge_text = "🚨 INSTITUTIONAL LEAK: 2026 ALGO"
+        draw.rounded_rectangle([(60, 50), (60 + 480, 50 + 55)], radius=10, fill=(255, 38, 0))
+        draw.text((80, 58), badge_text, fill=(255, 255, 255), font=font_badge)
+
+        # 5. Main Punchy Text with Heavy Drop Shadow
+        def draw_shadow_text(x, y, text, fill_color):
+            for ox in [-4, 0, 4]:
+                for oy in [-4, 0, 4]:
+                    draw.text((x + ox, y + oy), text, fill=(0, 0, 0), font=font_large)
+            draw.text((x, y), text, fill=fill_color, font=font_large)
+
+        draw_shadow_text(60, 150, line1, (255, 214, 10))
+        draw_shadow_text(60, 245, line2, (255, 255, 255))
+
+        # 6. Secondary Shock Stat Callout Box
+        stat_text = random.choice(["+$420,000,000 DRAIN", "99% RETAIL TRAPPED", "WIN RATE: 82.4%", "CENTRAL BANK ENTRY"])
+        draw.rounded_rectangle([(60, 370), (60 + 440, 370 + 65)], radius=8, fill=(0, 200, 83), outline=(255, 255, 255), width=2)
+        draw.text((80, 380), stat_text, fill=(0, 0, 0), font=font_stat)
+
+        # 7. Red Accent Border (Makes thumbnail POP in Rumble feeds)
+        draw.rectangle([(0, 0), (width-1, height-1)], outline=(255, 45, 85), width=8)
+
+        # 8. Channel Stamp in Bottom Right
+        ch_text = f"EXCLUSIVE: {channel.upper()}"
+        draw.rounded_rectangle([(width - 450, height - 75), (width - 40, height - 25)], radius=6, fill=(18, 24, 38))
+        draw.text((width - 430, height - 68), ch_text, fill=(0, 229, 255))
+
+        img.save(str(out_path), "JPEG", quality=95)
+        print(f"[ThumbnailVault] 🎨 Bespoke Topic-Specific Thumbnail Generated: {out_path.name} ({out_path.stat().st_size} bytes)")
+        return out_path
+    except Exception as e:
+        print(f"[ThumbnailVault] ⚠️ Procedural thumbnail generation fallback: {e}")
+        return None
+
+def select_random_thumbnail(topic: str = "", channel: str = "", job_id: int = 1) -> Optional[Path]:
+    """Generates a bespoke topic-matched high-CTR thumbnail for every single video, with vault fallbacks."""
+    if topic:
+        dynamic_thumb_path = Path(f"output/thumb_job_{job_id}_{channel}.jpg")
+        thumb = generate_dynamic_high_ctr_thumbnail(topic, channel, dynamic_thumb_path)
+        if thumb and thumb.exists():
+            return thumb
+
+    # Fallback to vault if procedural generation is unavailable
     search_dirs = [Path("assets/thumbnails"), Path("storage/thumbnails"), Path("thumbnails")]
     for d in search_dirs:
         if d.exists() and d.is_dir():
@@ -1055,8 +1170,8 @@ def main():
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
     render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video, script_text=script_content, movement_timings=mov_timings)
 
-    # 5.5 Pick a random custom thumbnail from the 1 - 1,000,000+ vault
-    custom_thumb = select_random_thumbnail()
+    # 5.5 Generate a bespoke, high-CTR topic-matched thumbnail for this specific video
+    custom_thumb = select_random_thumbnail(topic=topic, channel=channel, job_id=args.job_id)
 
     # 6. Direct Cloud-to-Rumble Publishing (Azure 10 Gbps Pipe)
     should_publish = args.auto_publish_rumble or (os.environ.get("AUTO_PUBLISH_RUMBLE", "").lower() == "true")
