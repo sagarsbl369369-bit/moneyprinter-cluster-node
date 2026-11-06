@@ -74,6 +74,7 @@ jobs:
         env:
           RUMBLE_SESSION_B64: ${{ secrets.RUMBLE_SESSION_B64 }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
           AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
         run: |
           GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
