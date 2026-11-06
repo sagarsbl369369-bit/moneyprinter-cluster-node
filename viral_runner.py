@@ -20,10 +20,10 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 try:
-    from cluster.viral_curriculum import get_viral_topic_for_job
+    from viral_curriculum import get_viral_topic_for_job
 except ImportError:
     try:
-        from viral_curriculum import get_viral_topic_for_job
+        from cluster.viral_curriculum import get_viral_topic_for_job
     except ImportError:
         def get_viral_topic_for_job(job_id: int):
             return {
@@ -38,10 +38,10 @@ except ImportError:
             }
 
 try:
-    from cluster.rumble_cloud_publisher import publish_video_from_cloud
+    from rumble_cloud_publisher import publish_video_from_cloud
 except ImportError:
     try:
-        from rumble_cloud_publisher import publish_video_from_cloud
+        from cluster.rumble_cloud_publisher import publish_video_from_cloud
     except ImportError:
         publish_video_from_cloud = None
 
