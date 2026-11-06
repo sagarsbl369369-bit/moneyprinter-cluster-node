@@ -179,7 +179,12 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
         
     out_template = str(out_dir / f"ingest_job_{job_id:02d}_%(id)s.%(ext)s")
     ydl_opts = {
-        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best[ext=mp4]/best/18',
+        'format': 'bestvideo*+bestaudio/best',
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'ios', 'web', 'tv']
+            }
+        },
         'outtmpl': out_template,
         'quiet': False,
         'no_warnings': True,
