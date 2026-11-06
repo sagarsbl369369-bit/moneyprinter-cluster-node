@@ -29,16 +29,40 @@ except ImportError:
         publish_video_from_cloud = None
         get_subchannel_id = None
 
-DEDUP_VAULT_PATH = PROJECT_ROOT / "storage" / "global_youtube_dedup_vault.json"
-CATALOG_PATH = CLUSTER_DIR / "usa_viral_100_catalog.json"
-CURATED_PATH = PROJECT_ROOT / "storage" / "first_20_curated_youtube_links.json"
+def get_curated_path() -> Optional[Path]:
+    candidates = [
+        Path(__file__).resolve().parent / "first_20_curated_youtube_links.json",
+        Path(__file__).resolve().parent / "storage" / "first_20_curated_youtube_links.json",
+        PROJECT_ROOT / "storage" / "first_20_curated_youtube_links.json"
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return None
+
+def get_catalog_path() -> Optional[Path]:
+    candidates = [
+        Path(__file__).resolve().parent / "usa_viral_100_catalog.json",
+        Path(__file__).resolve().parent / "cluster" / "usa_viral_100_catalog.json",
+        PROJECT_ROOT / "cluster" / "usa_viral_100_catalog.json"
+    ]
+    for c in candidates:
+        if c.exists():
+            return c
+    return None
 
 def load_dedup_vault() -> Dict[str, Any]:
-    if DEDUP_VAULT_PATH.exists():
-        try:
-            return json.loads(DEDUP_VAULT_PATH.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+    vault_candidates = [
+        Path(__file__).resolve().parent / "global_youtube_dedup_vault.json",
+        Path(__file__).resolve().parent / "storage" / "global_youtube_dedup_vault.json",
+        PROJECT_ROOT / "storage" / "global_youtube_dedup_vault.json"
+    ]
+    for p in vault_candidates:
+        if p.exists():
+            try:
+                return json.loads(p.read_text(encoding="utf-8"))
+            except Exception:
+                pass
     return {}
 
 def save_to_dedup_vault(video_id: str, metadata: Dict[str, Any]):
@@ -47,13 +71,23 @@ def save_to_dedup_vault(video_id: str, metadata: Dict[str, Any]):
         **metadata,
         "uploaded_at": time.strftime("%Y-%m-%d %H:%M:%S")
     }
-    DEDUP_VAULT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    DEDUP_VAULT_PATH.write_text(json.dumps(vault, indent=2), encoding="utf-8")
+    # Save to all accessible locations
+    paths = [
+        Path(__file__).resolve().parent / "global_youtube_dedup_vault.json",
+        PROJECT_ROOT / "storage" / "global_youtube_dedup_vault.json"
+    ]
+    for p in paths:
+        try:
+            p.parent.mkdir(parents=True, exist_ok=True)
+            p.write_text(json.dumps(vault, indent=2), encoding="utf-8")
+        except Exception:
+            pass
 
 def get_channel_info(job_id: int) -> Dict[str, Any]:
-    if CATALOG_PATH.exists():
+    c_path = get_catalog_path()
+    if c_path and c_path.exists():
         try:
-            cat = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
+            cat = json.loads(c_path.read_text(encoding="utf-8"))
             if cat:
                 return cat[(job_id - 1) % len(cat)]
         except Exception:
@@ -169,6 +203,7 @@ def main():
     target_video = None
     vault = load_dedup_vault()
     
+    curated_path = get_curated_path()
     if args.video_url:
         vid_id = args.video_url.split("v=")[-1].split("&")[0]
         target_video = {
@@ -177,9 +212,9 @@ def main():
             "title": f"Viral Public Docket #{vid_id}",
             "duration_min": 30.0
         }
-    elif CURATED_PATH.exists():
+    elif curated_path and curated_path.exists():
         try:
-            curated_list = json.loads(CURATED_PATH.read_text(encoding="utf-8"))
+            curated_list = json.loads(curated_path.read_text(encoding="utf-8"))
             idx = (args.curated_index - 1) if args.curated_index > 0 else (args.job_id - 1) % len(curated_list)
             candidate = curated_list[idx]
             if candidate["id"] in vault:
@@ -191,6 +226,41 @@ def main():
             target_video = candidate
         except Exception as e:
             print(f"[IngestRunner] Notice reading curated list: {e}")
+
+    # Fallback to automated safe public domain search if curated list is exhausted
+    if not target_video and yt_dlp:
+        print("[IngestRunner] 🔍 Auto-searching for fresh safe public FOIA bodycam / court stream...")
+        category = ch_info.get("category", "")
+        if "Court" in category:
+            query = "court livestream hearing full gaveltogavel"
+        elif "Senate" in category:
+            query = "senate committee hearing full uncut public domain"
+        elif "Interrogation" in category:
+            query = "detective interrogation room police foia full"
+        else:
+            query = "police bodycam raw traffic stop arrest foia"
+
+        try:
+            with yt_dlp.YoutubeDL({'quiet': True, 'extract_flat': True}) as ydl:
+                res = ydl.extract_info(f"ytsearch15:{query}", download=False)
+                for entry in res.get('entries', []):
+                    e_id = entry.get('id')
+                    e_title = entry.get('title') or ''
+                    e_dur = (entry.get('duration') or 0) / 60
+                    # Safety checks
+                    if any(tv in e_title.lower() for tv in ['a&e', 'court cam', 'hbo', 'netflix', 'fox news', 'cnn', 'nbc']):
+                        continue
+                    if e_id not in vault and 8 <= e_dur <= 360:
+                        target_video = {
+                            "id": e_id,
+                            "url": f"https://www.youtube.com/watch?v={e_id}",
+                            "title": e_title,
+                            "duration_min": round(e_dur, 1)
+                        }
+                        print(f"[IngestRunner] ✓ Discovered fresh safe target: [{e_id}] {e_title}")
+                        break
+        except Exception as se:
+            print(f"[IngestRunner] Auto-search notice: {se}")
 
     if not target_video:
         print("[IngestRunner] ❌ No target video resolved!")
@@ -254,7 +324,7 @@ Did the judge, officer, or committee handle this situation appropriately? Share 
             clean_title,
             thumbnail_path=thumb_result,
             seo_override=seo_override,
-            target_channel_id=ch_info.get("id")
+            target_channel_id=None
         )
 
     if live_url:
