@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Optional, List, Dict, Union, Any
 import urllib.request
 import urllib.error
+import urllib.parse
 
 import edge_tts
 
@@ -372,6 +373,63 @@ def load_verified_assets(assets_dir: Path):
 
     print(f"✓ Pure Assets Loaded: {len(hero_clips)} Hero clips, {len(bridge_clips)} Bridge clips.")
     return hero_clips, bridge_clips, bgm_path
+
+def fetch_dynamic_pixabay_clips(topic: str, api_key: str, job_id: int, max_clips: int = 4) -> List[Path]:
+    """Dynamically queries Pixabay API and downloads fresh, bespoke 1080p/4K financial clips for this specific video."""
+    out_dir = Path(f"output/pixabay_job_{job_id}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Financial semantic query banks for 200% topic match
+    queries = [
+        "stock market trading",
+        "wall street finance",
+        "forex trading chart",
+        "trader computer screen",
+        "financial data analytics",
+        "central bank federal reserve",
+        "stock exchange floor"
+    ]
+    
+    words = [w.lower() for w in topic.replace(":", " ").replace("-", " ").replace("|", " ").split() if len(w) > 3]
+    active_queries = [f"{w} finance" for w in words[:2]] + queries
+    
+    downloaded_clips = []
+    headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"}
+    seen_ids = set()
+    
+    for q in active_queries:
+        if len(downloaded_clips) >= max_clips:
+            break
+        safe_q = urllib.parse.quote(q)
+        url = f"https://pixabay.com/api/videos/?key={api_key}&q={safe_q}&per_page=6&video_type=film"
+        try:
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                data = json.loads(resp.read().decode())
+                hits = data.get("hits", [])
+                for h in hits:
+                    hid = h["id"]
+                    if hid in seen_ids:
+                        continue
+                    seen_ids.add(hid)
+                    v_info = h.get("videos", {}).get("large") or h.get("videos", {}).get("medium")
+                    if not v_info:
+                        continue
+                    v_url = v_info.get("url")
+                    clip_file = out_dir / f"pixabay_{hid}.mp4"
+                    if not clip_file.exists() or clip_file.stat().st_size < 10000:
+                        dl_req = urllib.request.Request(v_url, headers=headers)
+                        with urllib.request.urlopen(dl_req, timeout=20) as dl_resp, open(clip_file, "wb") as f:
+                            f.write(dl_resp.read())
+                    if clip_file.exists() and clip_file.stat().st_size > 10000:
+                        downloaded_clips.append(clip_file)
+                        print(f"  ✓ [Pixabay 10x Visual] Ingested Bespoke Clip: {clip_file.name} ({clip_file.stat().st_size / 1e6:.1f} MB)")
+                    if len(downloaded_clips) >= max_clips:
+                        break
+        except Exception as e:
+            print(f"  ⚠️ Pixabay query '{q}' notice: {e}")
+            
+    return downloaded_clips
 
 def generate_cold_open_hook_card(topic: str, out_path: Path):
     """Generates an intense institutional emergency alert hook card for the first 4-5 seconds."""
@@ -1159,8 +1217,16 @@ def main():
     raw_voice_path.parent.mkdir(parents=True, exist_ok=True)
     mov_timings = asyncio.run(synthesize_chunked_audio_async(script_content, voice, raw_voice_path))
 
-    # 3. Assets & Suspense BGM
+    # 3. Assets & Dynamic Pixabay 10x Sourcing
     hero_clips, bridge_clips, bgm_path = load_verified_assets(Path("assets"))
+    pixabay_key = os.environ.get("PIXABAY_API_KEY")
+    if pixabay_key:
+        print(f"\n[Pixabay Sourcing] 🌐 Dynamically Fetching Bespoke 4K/1080p Stock Clips for: '{topic[:40]}'...")
+        dyn_clips = fetch_dynamic_pixabay_clips(topic, pixabay_key, args.job_id, max_clips=4)
+        if dyn_clips:
+            hero_clips = dyn_clips[:len(dyn_clips)//2 or 1] + hero_clips
+            bridge_clips = dyn_clips[len(dyn_clips)//2 or 1:] + bridge_clips
+            print(f"✓ Dynamically Augmented Asset Pool with {len(dyn_clips)} 10x Pixabay Visuals!")
 
     # 4. Cinematic Audio Ducking (Voice 1.35 + BGM 0.20 + Procedural Tension Fallback)
     ducked_audio_path = Path(f"output/ducked_audio_job_{args.job_id}.mp3")
@@ -1170,8 +1236,9 @@ def main():
     out_video = Path(f"output/masterclass_16min_job_{args.job_id:02d}_{channel}.mp4")
     render_16min_masterclass(ducked_audio_path, hero_clips, bridge_clips, topic, out_video, script_text=script_content, movement_timings=mov_timings)
 
-    # 5.5 Generate a bespoke, high-CTR topic-matched thumbnail for this specific video
-    custom_thumb = select_random_thumbnail(topic=topic, channel=channel, job_id=args.job_id)
+    # 5.5 ZERO-THUMBNAIL ORGANIC MODE: Rumble automatically captures native high-res video frame
+    custom_thumb = None
+    print(f"[ThumbnailVault] 🌿 ZERO-THUMBNAIL ORGANIC MODE: Custom thumbnail disabled. Rumble will auto-capture native video frame.")
 
     # 6. Direct Cloud-to-Rumble Publishing (Azure 10 Gbps Pipe)
     should_publish = args.auto_publish_rumble or (os.environ.get("AUTO_PUBLISH_RUMBLE", "").lower() == "true")
