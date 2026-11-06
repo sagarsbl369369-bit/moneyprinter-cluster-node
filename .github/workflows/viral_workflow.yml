@@ -99,10 +99,10 @@ jobs:
                   total_sec += max(dur, 0.0)
 
           used_min = total_sec / 60.0
-          print(f"Hard-Lock Runtime Meter: {used_min:.1f} / 300.0 minutes used today")
+          print(f"Hard-Lock Runtime Meter: {used_min:.1f} / 500.0 minutes used today")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
-              if used_min >= 300.0:
-                  print("🛡️ [HARD-LOCK SAFETY ENFORCED]: 300 min 24h ceiling reached. Skipping run cleanly.")
+              if used_min >= 500.0:
+                  print("🛡️ [HARD-LOCK SAFETY ENFORCED]: 500 min 24h ceiling reached. Skipping run cleanly.")
                   f.write("approved=false\n")
                   os.system("gh run cancel " + str(curr_id) + " || true")
               else:
