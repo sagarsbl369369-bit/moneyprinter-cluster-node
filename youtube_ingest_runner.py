@@ -179,12 +179,13 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
         
     out_template = str(out_dir / f"ingest_job_{job_id:02d}_%(id)s.%(ext)s")
     ydl_opts = {
-        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best[ext=mp4]/best',
+        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best[ext=mp4]/best/18',
         'outtmpl': out_template,
         'quiet': False,
         'no_warnings': True,
         'merge_output_format': 'mp4',
-        'remote_components': ['ejs:github']
+        'remote_components': ['ejs:github'],
+        'js_runtimes': {'node': {}}
     }
 
     # Detect node binary across Windows, Ubuntu Linux, and macOS
@@ -194,7 +195,7 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
             if Path(p).exists():
                 node_cmd = p
                 break
-    if node_cmd and Path(node_cmd).exists():
+    if node_cmd:
         ydl_opts['js_runtimes'] = {'node': {'path': str(node_cmd)}}
         print(f"[IngestRunner] ⚡ Linked Node.js JS challenge solver: {node_cmd}")
 
@@ -248,96 +249,65 @@ def main():
     print(f"[IngestRunner] 📺 Target Channel: {ch_info['title']} ({ch_info.get('handle', ch_info['name'])})")
     print(f"[IngestRunner] 📂 Category:       {ch_info['category']}")
 
-    # 2. Select Video (From Curated List, CLI argument, or Search)
-    target_video = None
+    # 2. Select Video & Download Real Stream (with genuine candidate fallback)
     vault = load_dedup_vault()
+    out_dir = Path("output")
+    out_dir.mkdir(parents=True, exist_ok=True)
     
-    curated_path = get_curated_path()
+    target_video = None
+    video_path = None
+
     if args.video_url:
         vid_id = args.video_url.split("v=")[-1].split("&")[0]
-        target_video = {
+        c = {
             "id": vid_id,
             "url": args.video_url,
             "title": f"Viral Public Docket #{vid_id}",
             "duration_min": 30.0
         }
-    elif curated_path and curated_path.exists():
-        try:
-            curated_list = json.loads(curated_path.read_text(encoding="utf-8"))
-            idx = (args.curated_index - 1) if args.curated_index > 0 else (args.job_id - 1) % len(curated_list)
-            candidate = curated_list[idx]
-            if candidate["id"] in vault:
-                print(f"[IngestRunner] ⚠️ Curated candidate {candidate['id']} already in Dedup Vault! Finding next un-ingested...")
-                for c in curated_list:
-                    if c["id"] not in vault:
-                        candidate = c
-                        break
-            target_video = candidate
-        except Exception as e:
-            print(f"[IngestRunner] Notice reading curated list: {e}")
+        if vid_id not in vault:
+            v_path = download_youtube_video(c["url"], out_dir, args.job_id)
+            if v_path and v_path.exists() and v_path.stat().st_size > 1000000:
+                target_video = c
+                video_path = v_path
 
-    # Fallback to automated safe public domain search if curated list is exhausted
-    if not target_video and yt_dlp:
-        print("[IngestRunner] 🔍 Auto-searching for fresh safe public FOIA bodycam / court stream...")
-        category = ch_info.get("category", "")
-        if "Court" in category:
-            query = "court livestream hearing full gaveltogavel"
-        elif "Senate" in category:
-            query = "senate committee hearing full uncut public domain"
-        elif "Interrogation" in category:
-            query = "detective interrogation room police foia full"
-        else:
-            query = "police bodycam raw traffic stop arrest foia"
+    if not video_path:
+        curated_path = get_curated_path()
+        curated_list = []
+        if curated_path and curated_path.exists():
+            try:
+                curated_list = json.loads(curated_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
 
-        try:
-            with yt_dlp.YoutubeDL({'quiet': True, 'extract_flat': True}) as ydl:
-                res = ydl.extract_info(f"ytsearch15:{query}", download=False)
-                for entry in res.get('entries', []):
-                    e_id = entry.get('id')
-                    e_title = entry.get('title') or ''
-                    e_dur = (entry.get('duration') or 0) / 60
-                    # Safety checks
-                    if any(tv in e_title.lower() for tv in ['a&e', 'court cam', 'hbo', 'netflix', 'fox news', 'cnn', 'nbc']):
-                        continue
-                    if e_id not in vault and 8 <= e_dur <= 360:
-                        target_video = {
-                            "id": e_id,
-                            "url": f"https://www.youtube.com/watch?v={e_id}",
-                            "title": e_title,
-                            "duration_min": round(e_dur, 1)
-                        }
-                        print(f"[IngestRunner] ✓ Discovered fresh safe target: [{e_id}] {e_title}")
-                        break
-        except Exception as se:
-            print(f"[IngestRunner] Auto-search notice: {se}")
+        if curated_list:
+            start_idx = (args.curated_index - 1) if args.curated_index > 0 else (args.job_id - 1)
+            candidate_indices = [(start_idx + i) % len(curated_list) for i in range(len(curated_list))]
+            for c_idx in candidate_indices:
+                candidate = curated_list[c_idx]
+                if candidate["id"] in vault:
+                    continue
+                print(f"[IngestRunner] 🎯 Trying Candidate: [{candidate['id']}] {candidate['title']}")
+                v_path = download_youtube_video(candidate["url"], out_dir, args.job_id)
+                if v_path and v_path.exists() and v_path.stat().st_size > 1000000:
+                    target_video = candidate
+                    video_path = v_path
+                    break
+                else:
+                    print(f"[IngestRunner] ⚠️ Candidate [{candidate['id']}] stream unavailable. Advancing to next genuine candidate...")
 
-    if not target_video:
-        print("[IngestRunner] ❌ No target video resolved!")
+    if not video_path or not target_video:
+        print("[IngestRunner] ❌ Error: No genuine YouTube video stream could be downloaded.")
+        print("[IngestRunner] 🛑 Strict Channel Authenticity Enforced: Skipping this job (ZERO FAKE AI SYNTHETIC VIDEOS).")
         sys.exit(1)
 
     vid_id = target_video["id"]
-    print(f"[IngestRunner] 🎯 Selected Target: [{vid_id}] {target_video['title']}")
-    print(f"[IngestRunner] ⏱️ Duration:        {target_video.get('duration_min', 0)} mins")
-
-    # 3. Check Deduplication Vault
-    if vid_id in vault:
-        print(f"[IngestRunner] 🛑 DEDUP VAULT LOCK: Video {vid_id} has already been uploaded! Skipping.")
-        sys.exit(0)
+    print(f"[IngestRunner] ✓ LOCKED TARGET: [{vid_id}] {target_video['title']}")
+    print(f"[IngestRunner] ⏱️ Duration:      {target_video.get('duration_min', 0)} mins")
 
     clean_title = target_video["title"]
     if len(clean_title) > 88:
         clean_title = clean_title[:85] + "..."
-
-    # 4. Download 720p Video Stream (or seamless fallback)
-    out_dir = Path("output")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    video_path = download_youtube_video(target_video["url"], out_dir, args.job_id)
-    thumb_result = None
-
-    if not video_path or not video_path.exists():
-        print(f"[IngestRunner] ❌ Error: Direct real YouTube video stream could not be downloaded for {target_video['url']}.")
-        print("[IngestRunner] 🛑 Strict Channel Authenticity Enforced: Skipping this job (ZERO FAKE AI SYNTHETIC VIDEOS).")
-        sys.exit(1)
 
     # Master 10x Clickbait Thumbnail Engine (Google Flow / Flux AI / Saturated Climax Frame)
     thumb_path = out_dir / f"master_thumb_{args.job_id}_{vid_id}.jpg"
