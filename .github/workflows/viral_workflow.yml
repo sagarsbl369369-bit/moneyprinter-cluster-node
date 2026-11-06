@@ -1,0 +1,95 @@
+name: USA Viral Court & Bodycam Ingestion (20 Concurrent Runners)
+
+on:
+  schedule:
+    - cron: '*/35 * * * *'
+  workflow_dispatch:
+    inputs:
+      batch_id:
+        description: 'Batch Identifier'
+        required: false
+        default: 'viral_wave'
+      start_index:
+        description: 'Global Channel Start Index'
+        required: false
+        default: '1'
+      auto_publish:
+        description: 'Publish directly to Rumble from Cloud'
+        required: false
+        default: 'true'
+
+jobs:
+  generate_viral_court:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      max-parallel: 20
+      matrix:
+        job_id: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Check 24/7 Autopilot Master State
+        run: |
+          STATE=$(curl -sSL https://raw.githubusercontent.com/sagarsbl369369-bit/moneyprinter-cluster-node/main/cluster/autopilot_state.json | grep -o '"viral_court_autopilot": *true' || true)
+          if [ "${{ github.event_name }}" = "schedule" ] && [ -z "$STATE" ]; then
+            echo "=========================================================================="
+            echo "⏸️  24/7 VIRAL COURT AUTOPILOT IS CURRENTLY PAUSED IN DASHBOARD"
+            echo "Viral switch is OFF. Exiting runner cleanly to preserve cloud quotas."
+            echo "=========================================================================="
+            exit 0
+          fi
+          echo "✓ 24/7 Viral Court Autopilot Verified ACTIVE (or Manual Dispatch). Proceeding!"
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install System Dependencies (FFmpeg, LibASS & Fonts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-liberation fonts-dejavu-core libass9
+
+      - name: Install Python Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install Playwright Chromium & System Dependencies
+        run: |
+          python -m playwright install --with-deps chromium
+
+      - name: Execute USA Viral Court Generation & Direct Cloud Ingest (Max Ads)
+        env:
+          RUMBLE_SESSION_B64: ${{ secrets.RUMBLE_SESSION_B64 }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
+        run: |
+          GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
+          echo "Executing Global Viral Channel Job: #$GLOBAL_ID (Matrix: ${{ matrix.job_id }}, Start Index: ${{ inputs.start_index }})"
+          python viral_runner.py \
+            --job-id $GLOBAL_ID \
+            --batch-id "${{ inputs.batch_id }}" \
+            --auto-publish-rumble
+
+      - name: Upload Rumble Live Ledger Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: viral-ledger-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          path: output/*.json
+          retention-days: 7
+
+      - name: Upload Viral Master Video Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: viral-video-job-${{ matrix.job_id }}-${{ inputs.batch_id }}
+          path: output/*.mp4
+          retention-days: 2
