@@ -204,37 +204,55 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
         ydl_opts['js_runtimes'] = {'node': {'path': str(node_cmd)}}
         print(f"[IngestRunner] ⚡ Linked Node.js JS challenge solver: {node_cmd}")
 
+    # Pass 1: Clean stream without datacenter cookie invalidation
+    cookie_file = None
     cookie_candidates = [
         Path("youtube_cookies.txt"),
         Path("storage/youtube_cookies.txt"),
         PROJECT_ROOT / "storage" / "youtube_cookies.txt"
     ]
     for c in cookie_candidates:
-        if c.exists():
-            ydl_opts['cookiefile'] = str(c.resolve())
-            print(f"[IngestRunner] 🍪 Attached authenticated YouTube cookies from {c.name}!")
+        if c.exists() and c.stat().st_size > 100:
+            cookie_file = str(c.resolve())
             break
-    
+
     print(f"[IngestRunner] ⬇️ Ingesting video stream from {video_url}...")
     start_t = time.time()
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=True)
-            filename = ydl.prepare_filename(info)
-            # Ensure mp4 extension
-            target_path = Path(filename)
-            if not target_path.exists():
-                alt_path = target_path.with_suffix('.mp4')
-                if alt_path.exists():
-                    target_path = alt_path
-            
-            elapsed = time.time() - start_t
-            size_mb = target_path.stat().st_size / (1024 * 1024)
-            print(f"[IngestRunner] ✓ Real Video Download completed in {elapsed:.1f}s: {target_path.name} ({size_mb:.1f} MB)")
-            return target_path
-    except Exception as e:
-        print(f"[IngestRunner] ❌ Download error: {e}")
-        return None
+    
+    # Try first with clean datacenter-friendly options (no stale cookie rejection)
+    for attempt, use_cookie in enumerate([False, True], 1):
+        attempt_opts = dict(ydl_opts)
+        if use_cookie and cookie_file:
+            attempt_opts['cookiefile'] = cookie_file
+            print(f"[IngestRunner] 🍪 Pass {attempt}: Retrying with authenticated session cookies...")
+        elif attempt > 1:
+            break
+
+        try:
+            with yt_dlp.YoutubeDL(attempt_opts) as ydl:
+                info = ydl.extract_info(video_url, download=True)
+                filename = ydl.prepare_filename(info)
+                target_path = Path(filename)
+                if not target_path.exists():
+                    for ext in [".mp4", ".mkv", ".webm"]:
+                        alt = target_path.with_suffix(ext)
+                        if alt.exists():
+                            target_path = alt
+                            break
+                
+                if target_path.exists() and target_path.stat().st_size > 1000000:
+                    elapsed = time.time() - start_t
+                    size_mb = target_path.stat().st_size / (1024 * 1024)
+                    print(f"[IngestRunner] ✓ Real Video Download completed in {elapsed:.1f}s: {target_path.name} ({size_mb:.1f} MB)")
+                    return target_path
+        except Exception as e:
+            print(f"[IngestRunner] ⚠️ Pass {attempt} notice: {e}")
+            if not use_cookie and cookie_file:
+                continue
+            break
+
+    print(f"[IngestRunner] ❌ Failed to download {video_url}")
+    return None
 
 def main():
     parser = argparse.ArgumentParser(description="YouTube-to-Rumble Viral Ingestion Engine")
