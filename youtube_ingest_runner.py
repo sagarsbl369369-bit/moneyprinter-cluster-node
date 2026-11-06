@@ -180,13 +180,19 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
         'outtmpl': out_template,
         'quiet': False,
         'no_warnings': True,
-        'merge_output_format': 'mp4',
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['android', 'mweb']
-            }
-        }
+        'merge_output_format': 'mp4'
     }
+
+    cookie_candidates = [
+        Path("youtube_cookies.txt"),
+        Path("storage/youtube_cookies.txt"),
+        PROJECT_ROOT / "storage" / "youtube_cookies.txt"
+    ]
+    for c in cookie_candidates:
+        if c.exists():
+            ydl_opts['cookiefile'] = str(c.resolve())
+            print(f"[IngestRunner] 🍪 Attached authenticated YouTube cookies from {c.name}!")
+            break
     
     print(f"[IngestRunner] ⬇️ Ingesting video stream from {video_url}...")
     start_t = time.time()
