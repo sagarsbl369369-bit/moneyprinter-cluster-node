@@ -2,8 +2,11 @@ import os
 import sys
 import json
 import time
+import shutil
 import argparse
+import subprocess
 import urllib.request
+import urllib.error
 from pathlib import Path
 from typing import Dict, Any, Optional, List
 
@@ -169,24 +172,42 @@ def generate_midroll_chapters(duration_sec: int, category: str) -> str:
     return "\n".join(lines)
 
 def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Optional[Path]:
-    """Downloads fast 720p H.264 stream via yt-dlp."""
+    """Downloads fast 720p H.264 stream via yt-dlp with Node.js n-challenge solving."""
     if not yt_dlp:
         print("[IngestRunner] ❌ Error: yt-dlp is not installed!")
         return None
         
     out_template = str(out_dir / f"ingest_job_{job_id:02d}_%(id)s.%(ext)s")
     ydl_opts = {
-        'format': '18/best[ext=mp4]/bestvideo[height<=720]+bestaudio/best',
+        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/bestvideo[height<=720]+bestaudio/best[ext=mp4]/best',
         'outtmpl': out_template,
         'quiet': False,
         'no_warnings': True,
         'merge_output_format': 'mp4',
-        'extractor_args': {
-            'youtube': {
-                'player_client': ['android', 'mweb']
-            }
-        }
+        'remote_components': ['ejs:github']
     }
+
+    # Detect node binary across Windows, Ubuntu Linux, and macOS
+    node_cmd = shutil.which("node") or shutil.which("nodejs")
+    if not node_cmd:
+        for p in ["/usr/bin/node", "/usr/local/bin/node", r"C:\Users\Sagar Agarwal\.gemini\antigravity\bin\node.cmd"]:
+            if Path(p).exists():
+                node_cmd = p
+                break
+    if node_cmd and Path(node_cmd).exists():
+        ydl_opts['js_runtimes'] = {'node': {'path': str(node_cmd)}}
+        print(f"[IngestRunner] ⚡ Linked Node.js JS challenge solver: {node_cmd}")
+
+    cookie_candidates = [
+        Path("youtube_cookies.txt"),
+        Path("storage/youtube_cookies.txt"),
+        PROJECT_ROOT / "storage" / "youtube_cookies.txt"
+    ]
+    for c in cookie_candidates:
+        if c.exists():
+            ydl_opts['cookiefile'] = str(c.resolve())
+            print(f"[IngestRunner] 🍪 Attached authenticated YouTube cookies from {c.name}!")
+            break
     
     print(f"[IngestRunner] ⬇️ Ingesting video stream from {video_url}...")
     start_t = time.time()
@@ -203,7 +224,7 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
             
             elapsed = time.time() - start_t
             size_mb = target_path.stat().st_size / (1024 * 1024)
-            print(f"[IngestRunner] ✓ Download completed in {elapsed:.1f}s: {target_path.name} ({size_mb:.1f} MB)")
+            print(f"[IngestRunner] ✓ Real Video Download completed in {elapsed:.1f}s: {target_path.name} ({size_mb:.1f} MB)")
             return target_path
     except Exception as e:
         print(f"[IngestRunner] ❌ Download error: {e}")
@@ -314,34 +335,106 @@ def main():
     thumb_result = None
 
     if not video_path or not video_path.exists():
-        print("[IngestRunner] ⚠️ YouTube direct stream blocked by bot challenge. Seamlessly activating 4K Narrative Synthesizer fallback...")
-        if generate_viral_script_segments:
-            try:
-                voice = BROADCAST_VOICES[(args.job_id - 1) % len(BROADCAST_VOICES)]
-                segments = generate_viral_script_segments(clean_title, ch_info["category"], ch_info["title"])
-                audio_path = synthesize_full_viral_audio(segments, voice, args.job_id)
-                clips = fetch_viral_pixabay_clips(clean_title, args.job_id, max_clips=4)
-                video_path = out_dir / f"viral_court_job_{args.job_id:02d}_{ch_info.get('name', 'desk')}.mp4"
-                render_viral_master_video(audio_path, clips, clean_title, ch_info["title"], video_path)
-                climax_thumb = out_dir / f"climax_thumb_job_{args.job_id}.jpg"
-                thumb_result = extract_climax_thumbnail(video_path, climax_thumb)
-                print("[IngestRunner] ✓ 4K Master Narrative rendered successfully via fallback engine!")
-            except Exception as fe:
-                print(f"[IngestRunner] ❌ Fallback render notice: {fe}")
-                sys.exit(1)
-        else:
-            print("[IngestRunner] ❌ Fallback renderer unavailable.")
-            sys.exit(1)
-    else:
-        # Download Original YouTube Thumbnail if stream succeeded
-        thumb_path = out_dir / f"orig_thumb_{args.job_id}_{vid_id}.jpg"
+        print(f"[IngestRunner] ❌ Error: Direct real YouTube video stream could not be downloaded for {target_video['url']}.")
+        print("[IngestRunner] 🛑 Strict Channel Authenticity Enforced: Skipping this job (ZERO FAKE AI SYNTHETIC VIDEOS).")
+        sys.exit(1)
+
+    # Master 10x Clickbait Thumbnail Engine (Google Flow / Flux AI / Saturated Climax Frame)
+    thumb_path = out_dir / f"master_thumb_{args.job_id}_{vid_id}.jpg"
+    thumb_result = None
+    try:
+        from master_viral_thumbnail_engine import build_master_thumbnail
+        thumb_result = build_master_thumbnail(video_path, vid_id, clean_title, ch_info["category"], thumb_path)
+    except Exception as te:
+        print(f"[IngestRunner] Master thumb notice: {te}. Extracting 1080p climax frame with FFmpeg...")
+
+    if not thumb_result or not Path(thumb_result).exists():
+        try:
+            dur_sec = int(target_video.get("duration_min", 30) * 60)
+            sample_sec = max(60, int(dur_sec * 0.15))
+            m = sample_sec // 60
+            s = sample_sec % 60
+            ts_str = f"00:{m:02d}:{s:02d}"
+            # Extract vibrant, high-contrast 1080p frame with FFmpeg
+            cmd = [
+                "ffmpeg", "-y", "-ss", ts_str, "-i", str(video_path),
+                "-vf", "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,eq=contrast=1.18:saturation=1.25",
+                "-vframes", "1", "-q:v", "2", str(thumb_path)
+            ]
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=25)
+            if thumb_path.exists() and thumb_path.stat().st_size > 10000:
+                thumb_result = thumb_path
+                print(f"[IngestRunner] 🖼️ Extracted 1080p Saturated Climax Thumbnail ({thumb_path.stat().st_size // 1024} KB)!")
+        except Exception as fe:
+            print(f"[IngestRunner] Frame extract notice: {fe}")
+
+    if not thumb_result or not Path(thumb_result).exists():
         thumb_result = download_thumbnail(vid_id, thumb_path)
 
-    # 5. Build SEO & Mid-Roll Chapters
-    duration_sec = int(target_video.get("duration_min", 30) * 60)
-    ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
+    # 5. Build 10x Groq SEO & Mid-Roll Chapters (with anti-429 jitter & retries)
+    duration_min = target_video.get("duration_min", 30.0)
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    seo_res = None
+    if groq_key:
+        time.sleep((args.job_id % 6) * 2 + 1)
+        for attempt in range(3):
+            try:
+                prompt = f"""You are a World-Class Viral Media Director & American Courtroom/Police Bodycam SEO Expert.
+Generate high-converting, 10x better than human SEO metadata for this YouTube public record video:
+Raw Title: "{target_video['title']}"
+Target Channel: "{ch_info['title']}"
+Category: "{ch_info['category']}"
+Duration: {duration_min} minutes
 
-    description = f"""🔥 VIRAL PUBLIC DOCKET: {target_video['title']}
+Generate strict JSON with:
+1. "viral_title": Under 88 characters. High CTR, explosive tension, captivating.
+2. "viral_description": High-engagement description with explosive legal summary, discussion question to drive comments, and official 6-minute mid-roll chapter timestamps up to {int(duration_min)} mins.
+3. "high_cpm_tags": 8-12 comma separated viral tags for maximum US advertiser CPM.
+"""
+                payload = {
+                    "model": "openai/gpt-oss-120b",
+                    "messages": [
+                        {"role": "system", "content": "You are a master viral SEO metadata engine. Output valid JSON only."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    "response_format": {"type": "json_object"},
+                    "temperature": 0.7
+                }
+                req = urllib.request.Request(
+                    "https://api.groq.com/openai/v1/chat/completions",
+                    data=json.dumps(payload).encode("utf-8"),
+                    headers={
+                        "Authorization": f"Bearer {groq_key}",
+                        "Content-Type": "application/json",
+                        "User-Agent": "Mozilla/5.0"
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=15) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                    seo_res = json.loads(data["choices"][0]["message"]["content"])
+                    print(f"[IngestRunner] 🧠 Groq 10x SEO Title: {seo_res.get('viral_title')}")
+                    break
+            except urllib.error.HTTPError as he:
+                if he.code == 429:
+                    wait_sec = 4 * (attempt + 1)
+                    print(f"[IngestRunner] Groq HTTP 429 Rate Limit. Backing off {wait_sec}s (Attempt {attempt+1}/3)...")
+                    time.sleep(wait_sec)
+                    continue
+                else:
+                    print(f"[IngestRunner] Groq SEO HTTP Error {he.code}: {he}")
+                    break
+            except Exception as ge:
+                print(f"[IngestRunner] Groq SEO notice: {ge}")
+                break
+
+    if seo_res and seo_res.get("viral_title"):
+        clean_title = seo_res["viral_title"][:88].strip()
+        description = seo_res["viral_description"]
+        tags = seo_res["high_cpm_tags"]
+    else:
+        duration_sec = int(duration_min * 60)
+        ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
+        description = f"""🔥 VIRAL PUBLIC DOCKET: {target_video['title']}
 Presented exclusively by {ch_info['title']}. Raw, unfiltered public record proceeding released under US Public Sunshine & Freedom of Information laws.
 
 💬 DISCUSSION QUESTION:
@@ -350,7 +443,7 @@ Did the judge, officer, or committee handle this situation appropriately? Share 
 🔔 Follow {ch_info['title']} for daily unfiltered public records, court cams, and bodycam releases.
 {ad_chapters}
 """
-    tags = f"{ch_info['name'].lower()}, public record, court cam, bodycam, foia, raw uncut, rumble viral, usa legal"
+        tags = f"{ch_info['name'].lower()}, public record, court cam, bodycam, foia, raw uncut, rumble viral, usa legal"
 
     seo_override = {
         "title": clean_title,
