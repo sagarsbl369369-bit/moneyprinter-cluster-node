@@ -96,6 +96,66 @@ def is_google_flow_ready() -> bool:
     except Exception:
         return False
 
+TUNNEL_FLOW_URL = os.environ.get(
+    "FLOW_TUNNEL_URL",
+    "https://unable-agents-shadow-country.trycloudflare.com/api/flow/generate_100x_thumbnail"
+)
+
+def upload_reference_thumbnail_to_flow(video_id: str) -> Optional[str]:
+    """Downloads source YouTube thumbnail and uploads to Google Flow project media library."""
+    try:
+        raw_thumb_path = ROOT_DIR / "scratch" / f"yt_source_{video_id}.jpg"
+        if not raw_thumb_path.exists():
+            download_youtube_raw_thumbnail(video_id, raw_thumb_path)
+        if raw_thumb_path.exists() and raw_thumb_path.stat().st_size > 5000:
+            import base64
+            b64_data = base64.b64encode(raw_thumb_path.read_bytes()).decode("utf-8")
+            data_url = f"data:image/jpeg;base64,{b64_data}"
+            payload = {
+                "command": "upload_asset",
+                "payload": {
+                    "filePath": str(raw_thumb_path),
+                    "dataUrl": data_url,
+                    "fileName": f"yt_ref_{video_id}.jpg"
+                },
+                "timeout": 15000
+            }
+            req = urllib.request.Request(
+                "http://127.0.0.1:8792/command",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json", "User-Agent": "Mozilla/5.0"}
+            )
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                res = json.loads(resp.read().decode("utf-8"))
+                if res.get("success"):
+                    print(f"[ThumbEngine] 📎 Source YouTube thumbnail uploaded to Google Flow media library!")
+                    return f"yt_ref_{video_id}.jpg"
+    except Exception as e:
+        print(f"[ThumbEngine] Notice uploading reference to Flow: {e}")
+    return None
+
+def fetch_tunnel_google_flow_thumbnail(video_id: str, title: str, category: str, out_path: Path) -> Optional[Path]:
+    """Fetches a Google Flow master thumbnail generated on the central server via Cloudflare Tunnel."""
+    try:
+        params = urllib.parse.urlencode({
+            "video_id": video_id,
+            "title": title,
+            "category": category
+        })
+        tunnel_url = f"{TUNNEL_FLOW_URL}?{params}"
+        print(f"[ThumbEngine] 🌐 Requesting Google Flow Master Thumbnail from Tunnel: {tunnel_url[:80]}...")
+        req = urllib.request.Request(tunnel_url, headers={"User-Agent": "ClusterNode/1.0"})
+        with urllib.request.urlopen(req, timeout=40) as resp:
+            if resp.status == 200:
+                data = resp.read()
+                if len(data) > 10000:
+                    out_path.write_bytes(data)
+                    print(f"[ThumbEngine] 🚀 Received 100x Google Flow Master Thumbnail via Tunnel ({len(data) // 1024} KB)!")
+                    return out_path
+    except Exception as e:
+        print(f"[ThumbEngine] Tunnel Google Flow notice: {e}")
+    return None
+
 def render_google_flow_thumbnail(prompt: str, out_path: Path) -> Optional[Path]:
     """Generates an 8K 16:9 master thumbnail on Google Flow via DeepX Extension Bridge."""
     payload = {
@@ -226,6 +286,7 @@ def build_master_thumbnail(
 
     # Step 2: Google Flow Imagen 3 AI Generation
     if is_google_flow_ready():
+        upload_reference_thumbnail_to_flow(video_id)
         flow_res = render_google_flow_thumbnail(clickbait_prompt, out_path)
         if flow_res and flow_res.exists():
             import shutil
@@ -235,7 +296,11 @@ def build_master_thumbnail(
                 pass
             return flow_res
     else:
-        print("[ThumbEngine] ℹ️ Google Flow Bridge offline or standby. Proceeding to Cloud AI Fallback...")
+        # Step 2B: Query Central Server via Cloudflare Tunnel (for 100% cloud server autonomy)
+        print("[ThumbEngine] ℹ️ Local Google Flow Bridge offline. Querying Central Server Tunnel...")
+        tunnel_res = fetch_tunnel_google_flow_thumbnail(video_id, raw_title, category, out_path)
+        if tunnel_res and tunnel_res.exists():
+            return tunnel_res
 
     # Step 3: Cloud AI Flux 16:9 Widescreen Fallback (Runs everywhere 24/7)
     cloud_res = render_cloud_ai_thumbnail(clickbait_prompt, out_path)
