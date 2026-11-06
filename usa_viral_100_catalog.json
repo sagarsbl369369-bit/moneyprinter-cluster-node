@@ -1,0 +1,1723 @@
+[
+  {
+    "id": 101,
+    "name": "TheSovereignGavel",
+    "title": "The Sovereign Gavel",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Sovereign citizens attempting maritime law vs exasperated county judges. Real courtroom dockets.",
+    "ad_cpm": "$35-$65",
+    "target_duration": "10-25 min",
+    "tags": [
+      "court cam",
+      "sovereign citizen",
+      "judge judy",
+      "contempt of court",
+      "instant regret"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 102,
+    "name": "CourtCamConfessions",
+    "title": "Court Cam Confessions",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Wild outbursts, table flips, and courtroom chaos caught live on public judicial docket cameras.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "12-30 min",
+    "tags": [
+      "courtroom drama",
+      "judge destroys",
+      "wild outburst",
+      "bond court",
+      "court cam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 103,
+    "name": "JudgeVsKaren",
+    "title": "Judge vs Karen Live",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Entitled defendants trying to lecture federal and state judges with hilarious consequences.",
+    "ad_cpm": "$28-$50",
+    "target_duration": "10-20 min",
+    "tags": [
+      "entitled karen",
+      "judge loses it",
+      "small claims",
+      "courtroom fail",
+      "traffic court"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 104,
+    "name": "DetroitDocketLive",
+    "title": "Detroit Docket Live",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Real cases from Michigan 36th District Court, Zoom court fails, and reality justice.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "15-30 min",
+    "tags": [
+      "zoom court",
+      "judge middleton",
+      "judge simpson",
+      "36th district",
+      "live court"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 105,
+    "name": "ContemptOfCourtFiles",
+    "title": "Contempt of Court Files",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Defendants getting sentenced to 30 days instantly for disrespecting the bench.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "10-25 min",
+    "tags": [
+      "contempt of court",
+      "bailiff takedown",
+      "sentencing day",
+      "angry judge",
+      "court drama"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 106,
+    "name": "SmallClaimsShowdown",
+    "title": "Small Claims Showdown",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Real landlord vs tenant disputes, neighbor battles, and breach of contract small claims.",
+    "ad_cpm": "$35-$65",
+    "target_duration": "12-28 min",
+    "tags": [
+      "small claims",
+      "judge judy format",
+      "landlord tenant",
+      "court trial",
+      "lawsuit"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 107,
+    "name": "BondCourtConfidential",
+    "title": "Bond Court Confidential",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Pre-trial bond reductions, bizarre excuses, and bond denials in high-stakes preliminary hearings.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-25 min",
+    "tags": [
+      "bond court",
+      "pre-trial hearing",
+      "bail denied",
+      "docket live",
+      "public records"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 108,
+    "name": "FloridaCourtUncut",
+    "title": "Florida Court Uncut",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "The wildest civil and criminal hearings from Florida 9th Judicial Circuit public dockets.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "15-30 min",
+    "tags": [
+      "florida court",
+      "florida man",
+      "live trial",
+      "gavel to gavel",
+      "unfiltered justice"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 109,
+    "name": "SentencingDayReactions",
+    "title": "Sentencing Day Reactions",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Raw emotional reactions, victim impact statements, and final judicial life sentences.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "15-30 min",
+    "tags": [
+      "sentencing reaction",
+      "judge lecture",
+      "life sentence",
+      "courtroom tears",
+      "verdict"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 110,
+    "name": "TrafficCourtSmackdown",
+    "title": "Traffic Court Smackdown",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Drivers arguing with radar gun footage vs no-nonsense municipal judges.",
+    "ad_cpm": "$25-$48",
+    "target_duration": "10-20 min",
+    "tags": [
+      "traffic court",
+      "speeding ticket",
+      "suspended license",
+      "municipal court",
+      "judge"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 111,
+    "name": "TheGavelProtocol",
+    "title": "The Gavel Protocol",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "High-stakes criminal preliminary hearings, bail debates, and motions to suppress.",
+    "ad_cpm": "$32-$58",
+    "target_duration": "15-30 min",
+    "tags": [
+      "criminal trial",
+      "motions hearing",
+      "defense attorney",
+      "cross examination"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 112,
+    "name": "ZoomCourtDisasters",
+    "title": "Zoom Court Disasters",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Hilarious remote court hearings, wrong filters, driving while suspended, and background mishaps.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-20 min",
+    "tags": [
+      "zoom court",
+      "zoom fail",
+      "remote hearing",
+      "funny court",
+      "judge outburst"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 113,
+    "name": "OhioJusticeDocket",
+    "title": "Ohio Justice Docket",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Live criminal trials, dramatic testimony, and raw rulings from Ohio municipal benches.",
+    "ad_cpm": "$28-$50",
+    "target_duration": "12-28 min",
+    "tags": [
+      "ohio court",
+      "cleveland docket",
+      "judge fleischer",
+      "court hearing"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 114,
+    "name": "TexasGavelLive",
+    "title": "Texas Gavel Live",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Lone Star State judges shutting down uncooperative defendants and aggressive attorneys.",
+    "ad_cpm": "$34-$62",
+    "target_duration": "15-30 min",
+    "tags": [
+      "texas court",
+      "harris county",
+      "texas justice",
+      "live trial",
+      "docket"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 115,
+    "name": "PublicDefenderDrama",
+    "title": "Public Defender Drama",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Tense courtroom arguments between defendants firing public defenders and exasperated judges.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "10-25 min",
+    "tags": [
+      "public defender",
+      "fire lawyer",
+      "self representation",
+      "court dispute"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 116,
+    "name": "EvictionCourtChronicles",
+    "title": "Eviction Court Chronicles",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Raw real-time residential eviction hearings, security deposit battles, and tenant claims.",
+    "ad_cpm": "$32-$58",
+    "target_duration": "12-25 min",
+    "tags": [
+      "eviction court",
+      "landlord battle",
+      "housing court",
+      "small claims"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 117,
+    "name": "TheJudgesLecture",
+    "title": "The Judge's Lecture",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Iconic speeches where veteran judges give unforgettable life lessons to repeat offenders.",
+    "ad_cpm": "$35-$65",
+    "target_duration": "10-25 min",
+    "tags": [
+      "judge lecture",
+      "life advice",
+      "emotional court",
+      "inspirational judge"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 118,
+    "name": "BailiffTakeDowns",
+    "title": "Bailiff Take Downs",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Instant courtroom security interventions when defendants turn aggressive or attempt escape.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "10-20 min",
+    "tags": [
+      "bailiff takedown",
+      "court escape",
+      "security intervention",
+      "court brawl"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 119,
+    "name": "SelfRepresentedDisasters",
+    "title": "Self Represented Disasters",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Pro se litigants attempting to cite obsolete legal dictionaries and getting completely baffled.",
+    "ad_cpm": "$35-$68",
+    "target_duration": "15-30 min",
+    "tags": [
+      "pro se fail",
+      "self represented",
+      "sovereign legal",
+      "courtroom disaster"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 120,
+    "name": "HighProfileCrossExam",
+    "title": "High Profile Cross Exam",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Elite trial lawyers dismantling perjured witness statements on the stand.",
+    "ad_cpm": "$38-$72",
+    "target_duration": "15-30 min",
+    "tags": [
+      "cross exam",
+      "perjury caught",
+      "trial lawyer",
+      "witness breakdown"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 121,
+    "name": "TheJuvenileDocket",
+    "title": "The Juvenile Docket",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Compassionate yet strict juvenile court interventions and parental confrontations.",
+    "ad_cpm": "$26-$48",
+    "target_duration": "10-22 min",
+    "tags": [
+      "juvenile court",
+      "teen trouble",
+      "judge stern",
+      "rehabilitation"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 122,
+    "name": "MunicipalFeuds",
+    "title": "Municipal Feuds",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "HOA lawsuits, property line wars, barking dog citations, and neighbor feuds.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-25 min",
+    "tags": [
+      "hoa feud",
+      "neighbor dispute",
+      "property line",
+      "city court"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 123,
+    "name": "CourtroomComedyHour",
+    "title": "Courtroom Comedy Hour",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Bizarre, hilarious, and accidental comedy from open microphone court sessions.",
+    "ad_cpm": "$25-$45",
+    "target_duration": "10-20 min",
+    "tags": [
+      "funny court",
+      "court blooper",
+      "accidental mute",
+      "hilarious witness"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 124,
+    "name": "SupremeCourtArguments",
+    "title": "Supreme Court Oral Arguments",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "SCOTUS historical and landmark oral argument audio synchronized with constitutional graphics.",
+    "ad_cpm": "$40-$80",
+    "target_duration": "15-30 min",
+    "tags": [
+      "scotus",
+      "supreme court",
+      "oral arguments",
+      "constitutional law"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 125,
+    "name": "GavelToGavelTrials",
+    "title": "Gavel to Gavel Trials",
+    "category": "Courtroom Feuds & Judge Judy Format",
+    "desc": "Complete preliminary hearings and jury verdicts from high-interest public court trials.",
+    "ad_cpm": "$35-$65",
+    "target_duration": "20-30 min",
+    "tags": [
+      "gavel to gavel",
+      "murder trial",
+      "jury verdict",
+      "state court"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 126,
+    "name": "BodycamUncutUSA",
+    "title": "Bodycam Uncut USA",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Raw frontline police bodycam from official department FOIA releases.",
+    "ad_cpm": "$35-$70",
+    "target_duration": "12-30 min",
+    "tags": [
+      "police bodycam",
+      "raw bodycam",
+      "police activity",
+      "arrest",
+      "foia public records"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 127,
+    "name": "SovereignTrafficStop",
+    "title": "Sovereign Traffic Stop",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Sovereign citizens claiming traveling not driving encounters that end in window breaches.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "10-25 min",
+    "tags": [
+      "sovereign citizen",
+      "traveling not driving",
+      "broken window",
+      "taser deployed",
+      "bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 128,
+    "name": "FieldSobrietyFails",
+    "title": "Field Sobriety Fails",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Hilarious and dramatic DUI breathalyzer arguments, acrobatics, and field sobriety tests.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "10-22 min",
+    "tags": [
+      "dui arrest",
+      "field sobriety",
+      "breathalyzer",
+      "bodycam",
+      "drunk driver fails"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 129,
+    "name": "StateTrooperHighwayWatch",
+    "title": "State Trooper Highway Watch",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Interstate drug interdictions, high-speed pit maneuvers, and K9 searches.",
+    "ad_cpm": "$32-$62",
+    "target_duration": "15-30 min",
+    "tags": [
+      "state trooper",
+      "highway patrol",
+      "k9 search",
+      "pit maneuver",
+      "high speed chase"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 130,
+    "name": "FirstAmendmentAuditCentral",
+    "title": "First Amendment Audit Central",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Citizens testing constitutionality at government buildings vs responding police officers.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "12-25 min",
+    "tags": [
+      "1st amendment audit",
+      "auditing the police",
+      "public photography",
+      "police encounter"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 131,
+    "name": "EntitledKarenVsOfficer",
+    "title": "Entitled Karen vs Officer",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Entitled drivers threatening officers with city council connections and getting arrested.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "10-22 min",
+    "tags": [
+      "entitled driver",
+      "karen arrested",
+      "police bodycam",
+      "instant regret",
+      "traffic stop"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 132,
+    "name": "HighSpeedIntercept",
+    "title": "High Speed Intercept",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Dashcam and aerial FLIR helicopter tracking of fleeing felony suspects.",
+    "ad_cpm": "$35-$68",
+    "target_duration": "15-30 min",
+    "tags": [
+      "high speed chase",
+      "spike strips",
+      "pit maneuver",
+      "police dashcam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 133,
+    "name": "K9UnitInAction",
+    "title": "K9 Unit in Action",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Police canines tracking hidden burglary suspects through woods and warehouses.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "10-20 min",
+    "tags": [
+      "police k9",
+      "canine unit",
+      "manhunt",
+      "bodycam dog",
+      "suspect apprehended"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 134,
+    "name": "AirportSecurityBusted",
+    "title": "Airport Security Busted",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Customs and border patrol intercepting hidden undeclared goods and narcotics.",
+    "ad_cpm": "$34-$65",
+    "target_duration": "12-25 min",
+    "tags": [
+      "border patrol",
+      "cbp",
+      "airport security",
+      "smuggling busted"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 135,
+    "name": "UndercoverStingOps",
+    "title": "Undercover Sting Ops",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Organized retail crime busts, stolen vehicle sting operations, and pawn shop raids.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "12-28 min",
+    "tags": [
+      "undercover sting",
+      "retail theft",
+      "police sting",
+      "bust"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 136,
+    "name": "FloridaSheriffFiles",
+    "title": "Florida Sheriff Files",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Frontline policing from Volusia, Polk, and Lee County sheriff departments.",
+    "ad_cpm": "$32-$62",
+    "target_duration": "12-28 min",
+    "tags": [
+      "polk county",
+      "grady judd",
+      "florida sheriff",
+      "raw bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 137,
+    "name": "The911TapeVault",
+    "title": "The 911 Tape Vault",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Chilling emergency dispatcher calls synchronized with arriving officer bodycam footage.",
+    "ad_cpm": "$35-$68",
+    "target_duration": "10-25 min",
+    "tags": [
+      "911 call",
+      "emergency dispatch",
+      "bodycam sync",
+      "police response"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 138,
+    "name": "ShoplifterConfrontations",
+    "title": "Shoplifter Confrontations",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Loss prevention officers and police arresting repeat retail shoplifting suspects.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-20 min",
+    "tags": [
+      "shoplifter busted",
+      "loss prevention",
+      "store security",
+      "arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 139,
+    "name": "BicyclePatrolDirect",
+    "title": "Bicycle Patrol Direct",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Urban downtown bike officers weaving through city traffic to stop street crimes.",
+    "ad_cpm": "$28-$50",
+    "target_duration": "10-22 min",
+    "tags": [
+      "bike police",
+      "downtown patrol",
+      "bodycam",
+      "foot chase"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 140,
+    "name": "SWATDoorBreach",
+    "title": "SWAT Door Breach",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "High-risk tactical team felony search warrants and barricaded suspect negotiations.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "15-30 min",
+    "tags": [
+      "swat raid",
+      "tactical breach",
+      "flashbang",
+      "search warrant",
+      "bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 141,
+    "name": "ParkRangerEncounters",
+    "title": "Park Ranger Encounters",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "National Park law enforcement dealing with illegal wildlife poaching and armed trespassers.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "12-25 min",
+    "tags": [
+      "park ranger",
+      "national park",
+      "wildlife police",
+      "remote arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 142,
+    "name": "FishAndWildlifePatrol",
+    "title": "Fish and Wildlife Patrol",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Waterway boat patrol stops, illegal netting, and maritime law enforcement.",
+    "ad_cpm": "$26-$48",
+    "target_duration": "10-22 min",
+    "tags": [
+      "game warden",
+      "boating stop",
+      "wildlife officer",
+      "maritime"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 143,
+    "name": "HotelRoomStandOffs",
+    "title": "Hotel Room Stand Offs",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Domestic disputes and uncooperative guests refusing checkout turning into felony arrests.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "10-25 min",
+    "tags": [
+      "hotel arrest",
+      "trespassing",
+      "police bodycam",
+      "room breach"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 144,
+    "name": "StolenVehicleRecoveries",
+    "title": "Stolen Vehicle Recoveries",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Automated License Plate Readers (ALPR) alerting officers to stolen vehicles on highways.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "12-25 min",
+    "tags": [
+      "stolen car",
+      "alpr hit",
+      "traffic felony",
+      "vehicle recovery"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 145,
+    "name": "UndercoverBuyBusts",
+    "title": "Undercover Buy Busts",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Narcotics detectives executing tactical takedowns during parking lot drug buys.",
+    "ad_cpm": "$34-$65",
+    "target_duration": "10-22 min",
+    "tags": [
+      "undercover bust",
+      "narcotics raid",
+      "takedown",
+      "detective cam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 146,
+    "name": "CampusPoliceReports",
+    "title": "Campus Police Reports",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "University police dealing with wild fraternity parties, campus trespassers, and dorm disturbances.",
+    "ad_cpm": "$25-$46",
+    "target_duration": "10-20 min",
+    "tags": [
+      "campus police",
+      "college arrest",
+      "fraternity dorm",
+      "bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 147,
+    "name": "HospitalEREncounters",
+    "title": "Hospital ER Encounters",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Officers called to emergency rooms to handle aggressive patients and protect medical staff.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-22 min",
+    "tags": [
+      "hospital police",
+      "er disturbance",
+      "officer restraint",
+      "bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 148,
+    "name": "DomesticDisputeMediations",
+    "title": "Domestic Dispute Mediations",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "High-tension domestic arguments de-escalated or ending in mandatory arrests.",
+    "ad_cpm": "$30-$55",
+    "target_duration": "12-25 min",
+    "tags": [
+      "domestic dispute",
+      "de-escalation",
+      "bodycam police",
+      "arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 149,
+    "name": "NightShiftPatrol",
+    "title": "Night Shift Patrol",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Late night alley prowlers, broken business glass, and graveyard shift encounters.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "12-28 min",
+    "tags": [
+      "night shift",
+      "graveyard patrol",
+      "burglary in progress",
+      "bodycam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 150,
+    "name": "CitizenAssistanceCalls",
+    "title": "Citizen Assistance Calls",
+    "category": "FOIA Police Bodycam & Real World Law Enforcement",
+    "desc": "Heartwarming and dramatic roadside rescues, CPR saves, and stranded motorist assistance.",
+    "ad_cpm": "$28-$50",
+    "target_duration": "10-20 min",
+    "tags": [
+      "police rescue",
+      "roadside hero",
+      "cpr save",
+      "good cop"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 151,
+    "name": "SenateFloorShowdowns",
+    "title": "Senate Floor Showdowns",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Fiery debates, filibuster clashes, and historic committee rhetoric from Capitol Hill.",
+    "ad_cpm": "$40-$80",
+    "target_duration": "15-30 min",
+    "tags": [
+      "senate hearing",
+      "congressional debate",
+      "capitol hill",
+      "c-span",
+      "public domain"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 152,
+    "name": "HouseOversightExposed",
+    "title": "House Oversight Exposed",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "House Oversight and Accountability committee grilling federal department secretaries.",
+    "ad_cpm": "$42-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "house oversight",
+      "grilling",
+      "whistleblower",
+      "hearing fireworks",
+      "c-span"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 153,
+    "name": "CongressVsBigTech",
+    "title": "Congress vs Big Tech",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Tech CEOs facing bipartisan grilling regarding privacy, child protection, and algorithms.",
+    "ad_cpm": "$45-$90",
+    "target_duration": "15-30 min",
+    "tags": [
+      "big tech hearing",
+      "senate judiciary",
+      "ceo grilled",
+      "algorithm exposed"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 154,
+    "name": "FBIDirectorUnderFire",
+    "title": "FBI Director Under Fire",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Tense questioning regarding federal investigations, surveillance, and civil liberties.",
+    "ad_cpm": "$40-$80",
+    "target_duration": "15-30 min",
+    "tags": [
+      "fbi hearing",
+      "doj oversight",
+      "senate committee",
+      "heated exchange",
+      "live testimony"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 155,
+    "name": "SecretServiceAccountability",
+    "title": "Secret Service Accountability",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Hearings investigating protective security breakdowns and agency protocol failures.",
+    "ad_cpm": "$42-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "secret service hearing",
+      "security failure",
+      "director resigns",
+      "congressional grilling"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 156,
+    "name": "TheBorderHearingVault",
+    "title": "The Border Hearing Vault",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Homeland Security secretaries grilled on border enforcement and policy.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "15-30 min",
+    "tags": [
+      "border hearing",
+      "homeland security",
+      "border patrol",
+      "congress"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 157,
+    "name": "FederalReserveGrilling",
+    "title": "Federal Reserve Grilling",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Lawmakers pressing Jerome Powell on inflation, interest rate hikes, and debt.",
+    "ad_cpm": "$45-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "jerome powell",
+      "federal reserve",
+      "inflation hearing",
+      "banking crisis"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 158,
+    "name": "DefenseSpendingAudit",
+    "title": "Defense Spending Audit",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Generals and Pentagon auditors questioned over failed balance sheet audits.",
+    "ad_cpm": "$40-$78",
+    "target_duration": "15-30 min",
+    "tags": [
+      "pentagon audit",
+      "defense spending",
+      "armed services",
+      "military budget"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 159,
+    "name": "WhistleblowerLiveTestimony",
+    "title": "Whistleblower Live Testimony",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Courageous federal and corporate whistleblowers testifying under oath before Congress.",
+    "ad_cpm": "$45-$90",
+    "target_duration": "15-30 min",
+    "tags": [
+      "whistleblower",
+      "under oath",
+      "congressional testimony",
+      "bombshell revelation"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 160,
+    "name": "IRSOversightLive",
+    "title": "IRS Oversight Live",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Tax agency commissioners grilled on taxpayer privacy and auditing policies.",
+    "ad_cpm": "$38-$72",
+    "target_duration": "12-25 min",
+    "tags": [
+      "irs hearing",
+      "tax oversight",
+      "congressional grilling",
+      "audits"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 161,
+    "name": "DOJSpecialCounselGrillings",
+    "title": "DOJ Special Counsel Grillings",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Special counsels questioned aggressively by House and Senate legal scholars.",
+    "ad_cpm": "$42-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "special counsel",
+      "doj hearing",
+      "house judiciary",
+      "legal clash"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 162,
+    "name": "WeaponizationHearingWatch",
+    "title": "Weaponization Hearing Watch",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Select subcommittee investigating the weaponization of the federal government.",
+    "ad_cpm": "$44-$88",
+    "target_duration": "15-30 min",
+    "tags": [
+      "weaponization committee",
+      "civil liberties",
+      "first amendment",
+      "congress"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 163,
+    "name": "JudiciaryCommitteeClashes",
+    "title": "Judiciary Committee Clashes",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Heated confirmation hearings and constitutional debate in the Senate Judiciary.",
+    "ad_cpm": "$40-$82",
+    "target_duration": "15-30 min",
+    "tags": [
+      "senate judiciary",
+      "judge confirmation",
+      "constitutional debate"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 164,
+    "name": "EnergyAndCommerceClash",
+    "title": "Energy and Commerce Clash",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Pharma executives, FDA officials, and energy chiefs questioned on mandates and costs.",
+    "ad_cpm": "$42-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "energy commerce",
+      "fda hearing",
+      "big pharma",
+      "congressional probe"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 165,
+    "name": "SpaceAndTechCommittee",
+    "title": "Space and Tech Committee",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "NASA leaders, aerospace executives, and scientists testifying on future space tech.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "15-30 min",
+    "tags": [
+      "nasa hearing",
+      "space tech",
+      "aerospace",
+      "science committee"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 166,
+    "name": "VeteransAffairsScrutiny",
+    "title": "Veterans Affairs Scrutiny",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "VA leadership held accountable for healthcare waiting times and veteran benefits.",
+    "ad_cpm": "$36-$70",
+    "target_duration": "12-28 min",
+    "tags": [
+      "va hearing",
+      "veterans affairs",
+      "military healthcare",
+      "oversight"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 167,
+    "name": "DepartmentOfEducationFeuds",
+    "title": "Department of Education Feuds",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "School choice, federal loans, and parental rights debated passionately in committee.",
+    "ad_cpm": "$36-$72",
+    "target_duration": "12-25 min",
+    "tags": [
+      "education hearing",
+      "school choice",
+      "student loans",
+      "congress"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 168,
+    "name": "LaborCommitteeConfrontations",
+    "title": "Labor Committee Confrontations",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Union leaders and corporate CEOs clashing over workplace regulations and minimum wage.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "12-28 min",
+    "tags": [
+      "labor committee",
+      "union boss",
+      "ceo debate",
+      "worker rights"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 169,
+    "name": "ForeignAffairsShowdown",
+    "title": "Foreign Affairs Showdown",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "State Department ambassadors questioned on international aid and foreign treaties.",
+    "ad_cpm": "$40-$82",
+    "target_duration": "15-30 min",
+    "tags": [
+      "foreign affairs",
+      "state department",
+      "diplomacy hearing",
+      "foreign aid"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 170,
+    "name": "HomelandSecurityBriefings",
+    "title": "Homeland Security Briefings",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Cybersecurity directors and threat analysts detailing national defense preparedness.",
+    "ad_cpm": "$40-$80",
+    "target_duration": "15-30 min",
+    "tags": [
+      "homeland security",
+      "cyber threat",
+      "national defense",
+      "hearing"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 171,
+    "name": "IntelligenceDeclassified",
+    "title": "Intelligence Declassified",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Unclassified public sessions of the Senate Select Committee on Intelligence.",
+    "ad_cpm": "$42-$85",
+    "target_duration": "15-30 min",
+    "tags": [
+      "intelligence committee",
+      "espionage hearing",
+      "surveillance",
+      "cia oversight"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 172,
+    "name": "SenateAgCommittee",
+    "title": "Senate Ag Committee",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Food supply chain resilience, drought relief, and fertilizer market dominance hearings.",
+    "ad_cpm": "$34-$68",
+    "target_duration": "12-25 min",
+    "tags": [
+      "agriculture hearing",
+      "food supply",
+      "farm bill",
+      "senate"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 173,
+    "name": "TransportationSafetyHearings",
+    "title": "Transportation Safety Hearings",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Aviation CEOs, FAA chiefs, and rail operators grilled after close calls and derailments.",
+    "ad_cpm": "$40-$82",
+    "target_duration": "15-30 min",
+    "tags": [
+      "faa hearing",
+      "aviation safety",
+      "boeing hearing",
+      "transportation"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 174,
+    "name": "SmallBusinessCommitteeWatch",
+    "title": "Small Business Committee Watch",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Main Street entrepreneurs confronting regulatory hurdles and inflation burdens.",
+    "ad_cpm": "$36-$70",
+    "target_duration": "12-25 min",
+    "tags": [
+      "small business",
+      "sba hearing",
+      "inflation impact",
+      "entrepreneurs"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 175,
+    "name": "TheGavelStrike",
+    "title": "The Gavel Strike",
+    "category": "US Senate & Congressional Hearing Fireworks",
+    "desc": "Iconic moments of committee chairpersons reprimanding unruly witnesses with the gavel.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "10-22 min",
+    "tags": [
+      "gavel strike",
+      "order in committee",
+      "senator reprimand",
+      "heated hearing"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 176,
+    "name": "TheInterrogationChamber",
+    "title": "The Interrogation Chamber",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Psychological detective breakdowns and murder suspect confession tapes in interview rooms.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "20-30 min",
+    "tags": [
+      "interrogation",
+      "detective psychology",
+      "confession tape",
+      "true crime",
+      "jcs style"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 177,
+    "name": "ColdCaseBreakthroughs",
+    "title": "Cold Case Breakthroughs",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Forensic genetic genealogy solving decades-old unidentified murder mysteries.",
+    "ad_cpm": "$36-$72",
+    "target_duration": "15-30 min",
+    "tags": [
+      "cold case",
+      "forensic dna",
+      "detective solved",
+      "true crime doc"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 178,
+    "name": "RingDoorbellCatch",
+    "title": "Ring Doorbell Catch",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Unbelievable front porch encounters, porch pirates, and trespassers caught on 4K cams.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "10-20 min",
+    "tags": [
+      "ring doorbell",
+      "caught on camera",
+      "porch pirate",
+      "front door footage"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 179,
+    "name": "PublicScammerConfronted",
+    "title": "Public Scammer Confronted",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Fake home contractors and phone scammers caught red-handed by vigilant victims.",
+    "ad_cpm": "$34-$68",
+    "target_duration": "12-25 min",
+    "tags": [
+      "scammer exposed",
+      "con artist caught",
+      "fraud confrontation",
+      "busted"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 180,
+    "name": "ATCEmergencyRecordings",
+    "title": "ATC Emergency Recordings",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Air Traffic Control communications synchronized with flight radars during engine failures.",
+    "ad_cpm": "$40-$85",
+    "target_duration": "12-25 min",
+    "tags": [
+      "atc audio",
+      "emergency landing",
+      "air traffic control",
+      "cockpit replay"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 181,
+    "name": "CoastGuardRescueCam",
+    "title": "Coast Guard Rescue Cam",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Helicopter rescue swimmers pulling stranded mariners from hurricane swells.",
+    "ad_cpm": "$35-$70",
+    "target_duration": "10-22 min",
+    "tags": [
+      "coast guard",
+      "rescue swimmer",
+      "maritime emergency",
+      "helicopter rescue"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 182,
+    "name": "ForensicEvidenceFiles",
+    "title": "Forensic Evidence Files",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Ballistics analysis, fingerprint match revelations, and digital forensics in trial.",
+    "ad_cpm": "$36-$70",
+    "target_duration": "15-30 min",
+    "tags": [
+      "forensic science",
+      "ballistics",
+      "digital evidence",
+      "crime lab"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 183,
+    "name": "PrisonIncidentReports",
+    "title": "Prison Incident Reports",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Correctional facility surveillance and tactical extraction of unruly inmates.",
+    "ad_cpm": "$32-$60",
+    "target_duration": "10-22 min",
+    "tags": [
+      "prison bodycam",
+      "correctional officer",
+      "jail security",
+      "inmate standoff"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 184,
+    "name": "BankRobberyResponse",
+    "title": "Bank Robbery Response",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Police dispatch audio and rapid arrival during silent alarm branch robberies.",
+    "ad_cpm": "$35-$68",
+    "target_duration": "12-25 min",
+    "tags": [
+      "bank robbery",
+      "silent alarm",
+      "police encirclement",
+      "arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 185,
+    "name": "BorderCargoInspections",
+    "title": "Border Cargo Inspections",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Massive commercial x-ray scanners exposing false wall compartments on trucks.",
+    "ad_cpm": "$34-$66",
+    "target_duration": "10-22 min",
+    "tags": [
+      "border x-ray",
+      "commercial truck",
+      "customs inspection",
+      "contraband"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 186,
+    "name": "ArmoredCarHeistFails",
+    "title": "Armored Car Heist Fails",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Security guard dashcam footage foiling daylight cash-in-transit ambushes.",
+    "ad_cpm": "$35-$70",
+    "target_duration": "10-20 min",
+    "tags": [
+      "armored car",
+      "cash transit",
+      "armed guard",
+      "heist fail"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 187,
+    "name": "WildWestPublicEncounters",
+    "title": "Wild West Public Encounters",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Citizens exercising public photography rights confronting aggressive private guards.",
+    "ad_cpm": "$28-$54",
+    "target_duration": "10-22 min",
+    "tags": [
+      "public photography",
+      "security guard fail",
+      "constitutional audit"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 188,
+    "name": "TheConfessionTapes",
+    "title": "The Confession Tapes",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Raw unedited video depositions and recorded voluntary confessions in detective suites.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "15-30 min",
+    "tags": [
+      "confession tape",
+      "detective interview",
+      "police room",
+      "murder confession"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 189,
+    "name": "BountyHunterApprehensions",
+    "title": "Bounty Hunter Apprehensions",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Fugitive recovery agents executing warrants on skipped felony bond defendants.",
+    "ad_cpm": "$32-$62",
+    "target_duration": "10-22 min",
+    "tags": [
+      "bounty hunter",
+      "bail recovery",
+      "fugitive arrest",
+      "tactical entry"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 190,
+    "name": "EmergencyMedical911",
+    "title": "Emergency Medical 911",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Paramedic frontline bodycam and highway crash extrications by first responders.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "10-22 min",
+    "tags": [
+      "paramedic bodycam",
+      "first responder",
+      "ems rescue",
+      "ambulance dashcam"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 191,
+    "name": "HighwayCargoTheftStings",
+    "title": "Highway Cargo Theft Stings",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "GPS bait trailers leading troopers straight to organized freight theft warehouses.",
+    "ad_cpm": "$34-$66",
+    "target_duration": "12-25 min",
+    "tags": [
+      "cargo theft",
+      "freight sting",
+      "trooper raid",
+      "stolen cargo"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 192,
+    "name": "SubwayPatrolChronicles",
+    "title": "Subway Patrol Chronicles",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Transit police bodycam resolving platform disputes and subway tunnel investigations.",
+    "ad_cpm": "$28-$52",
+    "target_duration": "10-20 min",
+    "tags": [
+      "subway police",
+      "transit bodycam",
+      "metro security",
+      "platform arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 193,
+    "name": "MaritimeHarborPolice",
+    "title": "Maritime Harbor Police",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "High-speed watercraft intercepts, stolen yacht tracking, and port patrol stops.",
+    "ad_cpm": "$30-$58",
+    "target_duration": "10-22 min",
+    "tags": [
+      "harbor police",
+      "boat chase",
+      "port security",
+      "maritime arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 194,
+    "name": "StalkingCaseFiles",
+    "title": "Stalking Case Files",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Victim dashcam and security footage documenting persistent harassment to police.",
+    "ad_cpm": "$32-$62",
+    "target_duration": "12-25 min",
+    "tags": [
+      "stalking evidence",
+      "dashcam proof",
+      "restraining order",
+      "police arrest"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 195,
+    "name": "ConArtistTakedown",
+    "title": "Con Artist Takedown",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Fraud squads raiding illegal call centers and securing asset freeze warrants.",
+    "ad_cpm": "$35-$70",
+    "target_duration": "12-25 min",
+    "tags": [
+      "call center raid",
+      "fraud squad",
+      "con artist arrest",
+      "asset freeze"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 196,
+    "name": "ArsonInvestigationUnit",
+    "title": "Arson Investigation Unit",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Fire marshals using chemical sniffers to locate pour patterns and insurance fraud.",
+    "ad_cpm": "$32-$64",
+    "target_duration": "12-25 min",
+    "tags": [
+      "arson investigation",
+      "fire marshal",
+      "insurance fraud",
+      "pour pattern"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 197,
+    "name": "HostageNegotiationAudio",
+    "title": "Hostage Negotiation Audio",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Tense real-life recordings of certified crisis negotiators calming armed suspects.",
+    "ad_cpm": "$38-$75",
+    "target_duration": "15-30 min",
+    "tags": [
+      "hostage negotiator",
+      "crisis audio",
+      "police negotiator",
+      "peaceful surrender"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 198,
+    "name": "MissingPersonRecoveries",
+    "title": "Missing Person Recoveries",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Thermal drone operators and search teams locating hikers lost in rugged terrain.",
+    "ad_cpm": "$32-$65",
+    "target_duration": "12-25 min",
+    "tags": [
+      "thermal drone",
+      "search and rescue",
+      "missing hiker",
+      "found alive"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 199,
+    "name": "PublicTransportIncidents",
+    "title": "Public Transport Incidents",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Bus surveillance cameras capturing wild passenger disturbances and driver intervention.",
+    "ad_cpm": "$26-$48",
+    "target_duration": "10-20 min",
+    "tags": [
+      "bus fight",
+      "transit security",
+      "driver intervenes",
+      "caught on camera"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  },
+  {
+    "id": 200,
+    "name": "TheJusticeArchive",
+    "title": "The Justice Archive",
+    "category": "True Crime, Investigations & Public Reality",
+    "desc": "Historic landmark court depositions and public judicial recordings from American history.",
+    "ad_cpm": "$35-$72",
+    "target_duration": "15-30 min",
+    "tags": [
+      "justice archive",
+      "historic trial",
+      "public deposition",
+      "court history"
+    ],
+    "monetization_mode": "EXCLUSIVE_VALUE_1_MAX_MIDROLL",
+    "midroll_cue_strategy": "STRUCTURED_DESCRIPTION_TIMESTAMPS_5_BREAKS"
+  }
+]
