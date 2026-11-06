@@ -65,8 +65,14 @@ def generate_seo_metadata(topic: str, channel_title: str, job_id: int) -> Dict[s
     desc = f"""🔥 Masterclass Episode #{job_id}: {topic}
 Welcome to {channel_title}. In this institutional masterclass, we break down high-level order flow, central bank liquidity algorithms, and asymmetric risk models.
 
+💬 TRADER ENGAGEMENT QUESTION:
+Which session do you struggle with the most — London Open or New York Open? Drop your primary trading asset (EURUSD, NQ, Gold, BTC) in the comments below, and our algorithmic desk will analyze the order block signatures in our next masterclass!
+
+🔔 Follow {channel_title} & hit the bell for daily institutional SMC breakdowns.
+
 ⏱️ CHAPTERS & TIMESTAMPS:
-00:00 - The High-Frequency Microstructure
+00:00 - Institutional Cold-Open Shock Hook
+00:45 - The High-Frequency Microstructure
 03:15 - Identifying Institutional Order Blocks
 07:45 - Fair Value Gap Delivery & Algorithmic Exploits
 11:30 - Asymmetric 1:3.5 Risk Model Execution
@@ -74,7 +80,7 @@ Welcome to {channel_title}. In this institutional masterclass, we break down hig
 
 ⚠️ DISCLAIMER: Educational purposes only. Not financial advice.
 
-#SmartMoneyConcepts #TradingMasterclass #OrderBlock #PriceAction #Forex #Crypto"""
+#SmartMoneyConcepts #TradingMasterclass #OrderBlock #PriceAction #Forex #Crypto #ICT"""
 
     tags = "smart money concepts, order block, price action, trading strategy, ict, forex, crypto, day trading"
     return {"title": raw_title, "description": desc, "tags": tags}
