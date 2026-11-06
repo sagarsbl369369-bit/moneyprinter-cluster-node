@@ -202,6 +202,36 @@ def publish_video_from_cloud(
         if tags_input:
             tags_input.fill(seo["tags"])
 
+        # 2.5 Lock Categories: Primary = Viral (#1), Secondary = News (#5) for Max Ad Eligibility & Algorithmic Browse
+        print("[CloudPublisher] 🏷️ Locking Categories: Primary = Viral (#1), Secondary = News (#5)...")
+        try:
+            page.evaluate("""() => {
+                const primaryHidden = document.getElementById('category_primary');
+                if (primaryHidden) primaryHidden.value = '1';
+                const primaryInput = document.querySelector("input[name='primary-category']");
+                if (primaryInput) {
+                    primaryInput.value = 'Viral';
+                    primaryInput.dispatchEvent(new Event('input', {bubbles: true}));
+                    primaryInput.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+                const opt1 = document.querySelector(".select-option[data-value='1']");
+                if (opt1) opt1.click();
+
+                const secHidden = document.getElementById('category_secondary');
+                if (secHidden) secHidden.value = '5';
+                const secInput = document.querySelector("input[name='secondary-category']");
+                if (secInput) {
+                    secInput.value = 'News';
+                    secInput.dispatchEvent(new Event('input', {bubbles: true}));
+                    secInput.dispatchEvent(new Event('change', {bubbles: true}));
+                }
+                const opt5s = document.querySelectorAll(".select-option[data-value='5']");
+                if (opt5s.length > 0) opt5s[opt5s.length - 1].click();
+            }""")
+            print("[CloudPublisher] ✓ Categories successfully locked to Viral & News!")
+        except Exception as e:
+            print(f"[CloudPublisher] Category select notice: {e}")
+
         # 3. Lock Sub-Channel Strictly (NEVER upload to User Personal Profile '0')
         print(f"[CloudPublisher] 🔒 Locking Sub-Channel strictly: '{target_title}' (#{target_id})...")
         channel_locked = False
