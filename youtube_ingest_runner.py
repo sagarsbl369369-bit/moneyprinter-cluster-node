@@ -91,6 +91,43 @@ def load_dedup_vault() -> Dict[str, Any]:
                 pass
     return {}
 
+def build_binge_watch_links(current_vid_id: str, limit: int = 3) -> str:
+    """Builds a high-CTR binge watching recommendation section with other live Rumble links."""
+    vault = load_dedup_vault()
+    items = []
+    for vid, data in reversed(list(vault.items())):
+        if vid != current_vid_id and data.get("rumble_url") and data.get("title"):
+            items.append((data["title"], data["rumble_url"]))
+            if len(items) >= limit:
+                break
+    if not items:
+        return ""
+    section = "\n\n🔥 EXPLOSIVE RECOMMENDED EPISODES (MUST WATCH):\n"
+    for t, u in items:
+        section += f"👉 {t}\n   {u}\n"
+    return section
+
+def notify_indexnow_fast_track(rumble_url: str):
+    """Pings Bing, Yahoo & Seznam via IndexNow API within 60 seconds of video publication."""
+    try:
+        data = {
+            "host": "rumble.com",
+            "key": "4a7b5d1e2f3c8a9b0c1d2e3f4a5b6c7d",
+            "keyLocation": "https://rumble.com/4a7b5d1e2f3c8a9b0c1d2e3f4a5b6c7d.txt",
+            "urlList": [rumble_url]
+        }
+        req = urllib.request.Request(
+            "https://api.indexnow.org/indexnow",
+            data=json.dumps(data).encode("utf-8"),
+            headers={"Content-Type": "application/json; charset=utf-8"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            if resp.status in (200, 202):
+                print(f"[IndexNow] ✓ Fast-tracked to Bing & Yahoo: {rumble_url}")
+    except Exception as e:
+        print(f"[IndexNow] Notice: {e}")
+
 def save_to_dedup_vault(video_id: str, metadata: Dict[str, Any]):
     vault = load_dedup_vault()
     vault[video_id] = {
@@ -332,14 +369,28 @@ def main():
     if len(clean_title) > 88:
         clean_title = clean_title[:85] + "..."
 
-    # Master 10x Clickbait Thumbnail Engine (Google Flow / Flux AI / Saturated Climax Frame)
+    # Master 10x Clickbait Thumbnail Engine (Pre-baked Flow / Google Flow / Flux AI / Saturated Climax Frame)
     thumb_path = out_dir / f"master_thumb_{args.job_id}_{vid_id}.jpg"
     thumb_result = None
-    try:
-        from master_viral_thumbnail_engine import build_master_thumbnail
-        thumb_result = build_master_thumbnail(video_path, vid_id, clean_title, ch_info["category"], thumb_path)
-    except Exception as te:
-        print(f"[IngestRunner] Master thumb notice: {te}. Extracting 1080p climax frame with FFmpeg...")
+
+    # Check pre-baked high-res thumbnails first (0 local PC dependency)
+    prebaked_candidates = [
+        Path(f"thumbnails/{vid_id}.jpg"),
+        Path(f"cluster/thumbnails/{vid_id}.jpg"),
+        PROJECT_ROOT / "storage" / "flow_thumbs" / f"flow_thumb_{vid_id}.jpg"
+    ]
+    for pb in prebaked_candidates:
+        if pb.exists() and pb.stat().st_size > 10000:
+            thumb_result = pb
+            print(f"[IngestRunner] 🎨 Using Pre-Baked Master Google Flow Thumbnail: {pb.name} ({pb.stat().st_size // 1024} KB)")
+            break
+
+    if not thumb_result:
+        try:
+            from master_viral_thumbnail_engine import build_master_thumbnail
+            thumb_result = build_master_thumbnail(video_path, vid_id, clean_title, ch_info["category"], thumb_path)
+        except Exception as te:
+            print(f"[IngestRunner] Master thumb notice: {te}. Extracting 1080p climax frame with FFmpeg...")
 
     if not thumb_result or not Path(thumb_result).exists():
         try:
@@ -438,6 +489,11 @@ Did the judge, officer, or committee handle this situation appropriately? Share 
 """
         tags = f"{ch_info['name'].lower()}, public record, court cam, bodycam, foia, raw uncut, rumble viral, usa legal"
 
+    # Append Algorithmic Binge-Watching Cross Links
+    binge_links = build_binge_watch_links(vid_id)
+    if binge_links:
+        description += binge_links
+
     seo_override = {
         "title": clean_title,
         "description": description,
@@ -461,6 +517,8 @@ Did the judge, officer, or committee handle this situation appropriately? Share 
 
     if live_url:
         print(f"[IngestRunner] 🎉 LIVE ON RUMBLE: {live_url}")
+        # Fast-track into Bing & Yahoo via IndexNow
+        notify_indexnow_fast_track(live_url)
         # Commit to Dedup Vault
         save_to_dedup_vault(vid_id, {
             "title": target_video["title"],
