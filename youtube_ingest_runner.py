@@ -333,15 +333,67 @@ def main():
             print("[IngestRunner] ❌ Fallback renderer unavailable.")
             sys.exit(1)
     else:
-        # Download Original YouTube Thumbnail if stream succeeded
-        thumb_path = out_dir / f"orig_thumb_{args.job_id}_{vid_id}.jpg"
-        thumb_result = download_thumbnail(vid_id, thumb_path)
+        # Master 10x Clickbait AI Thumbnail Engine (Groq 120B -> Google Flow / Cloud AI Flux / Clean HD Frame)
+        thumb_path = out_dir / f"master_thumb_{args.job_id}_{vid_id}.jpg"
+        try:
+            from master_viral_thumbnail_engine import build_master_thumbnail
+            thumb_result = build_master_thumbnail(video_path, vid_id, clean_title, ch_info["category"], thumb_path)
+        except Exception as te:
+            print(f"[IngestRunner] Master thumb notice: {te}. Using fallback...")
+            thumb_result = download_thumbnail(vid_id, thumb_path)
 
-    # 5. Build SEO & Mid-Roll Chapters
-    duration_sec = int(target_video.get("duration_min", 30) * 60)
-    ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
+    # 5. Build 10x Groq SEO & Mid-Roll Chapters
+    duration_min = target_video.get("duration_min", 30.0)
+    groq_key = os.environ.get("GROQ_API_KEY", "")
+    seo_res = None
+    if groq_key:
+        try:
+            import urllib.request
+            prompt = f"""You are a World-Class Viral Media Director & American Courtroom/Police Bodycam SEO Expert.
+Generate high-converting, 10x better than human SEO metadata for this YouTube public record video:
+Raw Title: "{target_video['title']}"
+Target Channel: "{ch_info['title']}"
+Category: "{ch_info['category']}"
+Duration: {duration_min} minutes
 
-    description = f"""🔥 VIRAL PUBLIC DOCKET: {target_video['title']}
+Generate strict JSON with:
+1. "viral_title": Under 88 characters. High CTR, explosive tension, captivating.
+2. "viral_description": High-engagement description with explosive legal summary, discussion question to drive comments, and official 6-minute mid-roll chapter timestamps up to {int(duration_min)} mins.
+3. "high_cpm_tags": 8-12 comma separated viral tags for maximum US advertiser CPM.
+"""
+            payload = {
+                "model": "openai/gpt-oss-120b",
+                "messages": [
+                    {"role": "system", "content": "You are a master viral SEO metadata engine. Output valid JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
+                "response_format": {"type": "json_object"},
+                "temperature": 0.7
+            }
+            req = urllib.request.Request(
+                "https://api.groq.com/openai/v1/chat/completions",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {groq_key}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Mozilla/5.0"
+                }
+            )
+            with urllib.request.urlopen(req, timeout=12) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                seo_res = json.loads(data["choices"][0]["message"]["content"])
+                print(f"[IngestRunner] 🧠 Groq 10x SEO Title: {seo_res.get('viral_title')}")
+        except Exception as ge:
+            print(f"[IngestRunner] Groq SEO notice: {ge}. Using algorithmic high-CTR builder...")
+
+    if seo_res and seo_res.get("viral_title"):
+        clean_title = seo_res["viral_title"][:88].strip()
+        description = seo_res["viral_description"]
+        tags = seo_res["high_cpm_tags"]
+    else:
+        duration_sec = int(duration_min * 60)
+        ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
+        description = f"""🔥 VIRAL PUBLIC DOCKET: {target_video['title']}
 Presented exclusively by {ch_info['title']}. Raw, unfiltered public record proceeding released under US Public Sunshine & Freedom of Information laws.
 
 💬 DISCUSSION QUESTION:
@@ -350,7 +402,7 @@ Did the judge, officer, or committee handle this situation appropriately? Share 
 🔔 Follow {ch_info['title']} for daily unfiltered public records, court cams, and bodycam releases.
 {ad_chapters}
 """
-    tags = f"{ch_info['name'].lower()}, public record, court cam, bodycam, foia, raw uncut, rumble viral, usa legal"
+        tags = f"{ch_info['name'].lower()}, public record, court cam, bodycam, foia, raw uncut, rumble viral, usa legal"
 
     seo_override = {
         "title": clean_title,
