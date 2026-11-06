@@ -85,11 +85,20 @@ Which session do you struggle with the most — London Open or New York Open? Dr
     tags = "smart money concepts, order block, price action, trading strategy, ict, forex, crypto, day trading"
     return {"title": raw_title, "description": desc, "tags": tags}
 
-def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, topic: str, thumbnail_path: Optional[Path] = None) -> Optional[str]:
+def publish_video_from_cloud(
+    video_path: Path, 
+    job_id: int, 
+    channel_name: str, 
+    topic: str, 
+    thumbnail_path: Optional[Path] = None,
+    seo_override: Optional[Dict[str, Any]] = None,
+    target_channel_id: Optional[str] = None
+) -> Optional[str]:
     """
     Executes direct Cloud-to-Rumble publication from inside the GitHub Actions runner.
     Leverages Microsoft Azure's 10 Gbps symmetric pipe for 15-20s upload speeds.
-    Auto-attaches a random custom thumbnail from the 1 - 1,000,000 thumbnail vault.
+    Auto-attaches a random custom thumbnail or organic video frame.
+    Supports custom SEO override with 5 Mid-Roll breakpoints.
     """
     if not sync_playwright:
         print("[CloudPublisher] ❌ Playwright is not installed in the environment!")
@@ -111,9 +120,9 @@ def publish_video_from_cloud(video_path: Path, job_id: int, channel_name: str, t
     session_file.write_bytes(base64.b64decode(session_b64))
 
     ch_info = get_subchannel_id(job_id, channel_name)
-    target_id = ch_info["id"]
-    target_title = ch_info["title"]
-    seo = generate_seo_metadata(topic, target_title, job_id)
+    target_id = target_channel_id or ch_info["id"]
+    target_title = channel_name if target_channel_id else ch_info["title"]
+    seo = seo_override if seo_override else generate_seo_metadata(topic, target_title, job_id)
 
     file_size_mb = video_path.stat().st_size / (1024 * 1024)
     print("\n" + "=" * 70)
