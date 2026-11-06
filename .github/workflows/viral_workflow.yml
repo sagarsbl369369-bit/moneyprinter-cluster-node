@@ -113,9 +113,15 @@ jobs:
       - name: Anti-Fingerprint Jitter Stagger
         if: steps.hardlock_guard.outputs.approved == 'true'
         run: |
-          STAGGER=$(( (${{ matrix.job_id }} - 1) * 2 ))
+          STAGGER=$(( (${{ matrix.job_id }} - 1) * 3 ))
           echo "Applying anti-bot jitter delay: ${STAGGER}s..."
           sleep $STAGGER
+
+      - name: Set up Node.js 20 (YouTube Challenge Solver Engine)
+        if: steps.hardlock_guard.outputs.approved == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Set up Python 3.10
         if: steps.hardlock_guard.outputs.approved == 'true'
@@ -158,18 +164,11 @@ jobs:
           fi
           GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
           echo "Executing Global Viral Channel Job: #$GLOBAL_ID (Matrix: ${{ matrix.job_id }}, Start Index: ${{ inputs.start_index }})"
-          if [ -f "youtube_ingest_runner.py" ]; then
-            echo "🚀 Running Ultra-Fast YouTube Ingest Engine (Public Record / Original Thumbnails)..."
-            python youtube_ingest_runner.py \
-              --job-id $GLOBAL_ID \
-              --auto-publish-rumble
-          else
-            echo "🎙️ Running AI Viral Narrative Synthesizer..."
-            python viral_runner.py \
-              --job-id $GLOBAL_ID \
-              --batch-id "${{ inputs.batch_id }}" \
-              --auto-publish-rumble
-          fi
+          echo "Node.js Version: $(node -v)"
+          echo "🚀 Running Ultra-Fast YouTube Ingest Engine (100% Real Court/Bodycam Public Record)..."
+          python youtube_ingest_runner.py \
+            --job-id $GLOBAL_ID \
+            --auto-publish-rumble
 
       - name: Upload Rumble Live Ledger Artifact
         if: steps.hardlock_guard.outputs.approved == 'true'
