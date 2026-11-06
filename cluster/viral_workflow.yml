@@ -155,6 +155,7 @@ jobs:
           YOUTUBE_COOKIES_B64: ${{ secrets.YOUTUBE_COOKIES_B64 }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+          FLOW_TUNNEL_URL: https://unable-agents-shadow-country.trycloudflare.com/api/flow/generate_100x_thumbnail
           AUTO_PUBLISH_RUMBLE: ${{ inputs.auto_publish }}
         run: |
           if [ -n "$YOUTUBE_COOKIES_B64" ]; then
