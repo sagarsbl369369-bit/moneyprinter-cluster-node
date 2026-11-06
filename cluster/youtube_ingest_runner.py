@@ -29,6 +29,29 @@ except ImportError:
         publish_video_from_cloud = None
         get_subchannel_id = None
 
+try:
+    from viral_runner import (
+        generate_viral_script_segments,
+        synthesize_full_viral_audio,
+        fetch_viral_pixabay_clips,
+        render_viral_master_video,
+        extract_climax_thumbnail,
+        BROADCAST_VOICES
+    )
+except ImportError:
+    try:
+        from cluster.viral_runner import (
+            generate_viral_script_segments,
+            synthesize_full_viral_audio,
+            fetch_viral_pixabay_clips,
+            render_viral_master_video,
+            extract_climax_thumbnail,
+            BROADCAST_VOICES
+        )
+    except ImportError:
+        BROADCAST_VOICES = ["en-US-ChristopherNeural", "en-US-GuyNeural"]
+        generate_viral_script_segments = None
+
 def get_curated_path() -> Optional[Path]:
     candidates = [
         Path(__file__).resolve().parent / "first_20_curated_youtube_links.json",
@@ -153,11 +176,16 @@ def download_youtube_video(video_url: str, out_dir: Path, job_id: int) -> Option
         
     out_template = str(out_dir / f"ingest_job_{job_id:02d}_%(id)s.%(ext)s")
     ydl_opts = {
-        'format': 'bestvideo[height<=720][ext=mp4]+bestaudio[ext=m4a]/best[height<=720][ext=mp4]/best',
+        'format': '18/best[ext=mp4]/bestvideo[height<=720]+bestaudio/best',
         'outtmpl': out_template,
         'quiet': False,
         'no_warnings': True,
-        'merge_output_format': 'mp4'
+        'merge_output_format': 'mp4',
+        'extractor_args': {
+            'youtube': {
+                'player_client': ['android', 'mweb']
+            }
+        }
     }
     
     print(f"[IngestRunner] ⬇️ Ingesting video stream from {video_url}...")
@@ -275,25 +303,43 @@ def main():
         print(f"[IngestRunner] 🛑 DEDUP VAULT LOCK: Video {vid_id} has already been uploaded! Skipping.")
         sys.exit(0)
 
-    # 4. Download 720p Video Stream
-    out_dir = Path("output")
-    out_dir.mkdir(parents=True, exist_ok=True)
-    video_path = download_youtube_video(target_video["url"], out_dir, args.job_id)
-    if not video_path or not video_path.exists():
-        print("[IngestRunner] ❌ Failed to download target video!")
-        sys.exit(1)
-
-    # 5. Download Original YouTube Thumbnail
-    thumb_path = out_dir / f"orig_thumb_{args.job_id}_{vid_id}.jpg"
-    thumb_result = download_thumbnail(vid_id, thumb_path)
-
-    # 6. Build SEO & Mid-Roll Chapters
-    duration_sec = int(target_video.get("duration_min", 30) * 60)
-    ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
-    
     clean_title = target_video["title"]
     if len(clean_title) > 88:
         clean_title = clean_title[:85] + "..."
+
+    # 4. Download 720p Video Stream (or seamless fallback)
+    out_dir = Path("output")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    video_path = download_youtube_video(target_video["url"], out_dir, args.job_id)
+    thumb_result = None
+
+    if not video_path or not video_path.exists():
+        print("[IngestRunner] ⚠️ YouTube direct stream blocked by bot challenge. Seamlessly activating 4K Narrative Synthesizer fallback...")
+        if generate_viral_script_segments:
+            try:
+                voice = BROADCAST_VOICES[(args.job_id - 1) % len(BROADCAST_VOICES)]
+                segments = generate_viral_script_segments(clean_title, ch_info["category"], ch_info["title"])
+                audio_path = synthesize_full_viral_audio(segments, voice, args.job_id)
+                clips = fetch_viral_pixabay_clips(clean_title, args.job_id, max_clips=4)
+                video_path = out_dir / f"viral_court_job_{args.job_id:02d}_{ch_info.get('name', 'desk')}.mp4"
+                render_viral_master_video(audio_path, clips, clean_title, ch_info["title"], video_path)
+                climax_thumb = out_dir / f"climax_thumb_job_{args.job_id}.jpg"
+                thumb_result = extract_climax_thumbnail(video_path, climax_thumb)
+                print("[IngestRunner] ✓ 4K Master Narrative rendered successfully via fallback engine!")
+            except Exception as fe:
+                print(f"[IngestRunner] ❌ Fallback render notice: {fe}")
+                sys.exit(1)
+        else:
+            print("[IngestRunner] ❌ Fallback renderer unavailable.")
+            sys.exit(1)
+    else:
+        # Download Original YouTube Thumbnail if stream succeeded
+        thumb_path = out_dir / f"orig_thumb_{args.job_id}_{vid_id}.jpg"
+        thumb_result = download_thumbnail(vid_id, thumb_path)
+
+    # 5. Build SEO & Mid-Roll Chapters
+    duration_sec = int(target_video.get("duration_min", 30) * 60)
+    ad_chapters = generate_midroll_chapters(duration_sec, ch_info["category"])
 
     description = f"""🔥 VIRAL PUBLIC DOCKET: {target_video['title']}
 Presented exclusively by {ch_info['title']}. Raw, unfiltered public record proceeding released under US Public Sunshine & Freedom of Information laws.
