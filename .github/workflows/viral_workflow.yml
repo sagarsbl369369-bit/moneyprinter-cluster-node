@@ -151,10 +151,18 @@ jobs:
         run: |
           GLOBAL_ID=$(( ${{ matrix.job_id }} + ${{ inputs.start_index }} - 1 ))
           echo "Executing Global Viral Channel Job: #$GLOBAL_ID (Matrix: ${{ matrix.job_id }}, Start Index: ${{ inputs.start_index }})"
-          python viral_runner.py \
-            --job-id $GLOBAL_ID \
-            --batch-id "${{ inputs.batch_id }}" \
-            --auto-publish-rumble
+          if [ -f "youtube_ingest_runner.py" ]; then
+            echo "🚀 Running Ultra-Fast YouTube Ingest Engine (Public Record / Original Thumbnails)..."
+            python youtube_ingest_runner.py \
+              --job-id $GLOBAL_ID \
+              --auto-publish-rumble
+          else
+            echo "🎙️ Running AI Viral Narrative Synthesizer..."
+            python viral_runner.py \
+              --job-id $GLOBAL_ID \
+              --batch-id "${{ inputs.batch_id }}" \
+              --auto-publish-rumble
+          fi
 
       - name: Upload Rumble Live Ledger Artifact
         if: steps.hardlock_guard.outputs.approved == 'true'
